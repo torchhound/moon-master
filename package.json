@@ -4,7 +4,7 @@
   "description": "A Moon MUD",
   "main": "index.js",
   "directories": {
-    "test": "tests"
+    "test": "node endpointTest.js; mocha"
   },
   "scripts": {
     "test": "mocha"
@@ -25,9 +25,12 @@
   "dependencies": {
     "body-parser": "^1.17.0",
     "chai": "^3.5.0",
+    "ejs": "^2.5.6",
     "express": "^4.15.0",
     "mocha": "^3.2.0",
     "morgan": "^1.8.1",
+    "supertest": "^3.0.0",
+    "tape": "^4.6.3",
     "underscore": "^1.8.3"
   }
 }
