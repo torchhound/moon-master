@@ -1,0 +1,33 @@
+{
+  "name": "moon-master",
+  "version": "1.0.0",
+  "description": "A Moon MUD",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/torchhound/moon-master.git"
+  },
+  "keywords": [
+    "mud"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/torchhound/moon-master/issues"
+  },
+  "homepage": "https://github.com/torchhound/moon-master#readme",
+  "dependencies": {
+    "body-parser": "^1.17.0",
+    "chai": "^3.5.0",
+    "express": "^4.15.0",
+    "mocha": "^3.2.0",
+    "morgan": "^1.8.1",
+    "underscore": "^1.8.3"
+  }
+}
