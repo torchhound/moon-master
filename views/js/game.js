@@ -2,15 +2,18 @@ $("#submit").click(function(){
 	if($('#cli').val() == ''){
 		//do nothing
 	} else{
-		console.log({name: localStorage.getItem('name'), command: $('#cli').val()});
-		$.post('/api/cli', {name: localStorage.getItem('name'), command: $('#cli').val()}, function(data) {
-  			$('#output').html(data); //document.getElementById('output').textContent = data;
-		});/*
+		var obj = new Object();
+   		obj.name = localStorage.getItem('name');
+   		obj.command  = $('#cli').val();
+   		var jsonString= JSON.stringify(obj);
+		console.log(jsonString);
 		$.ajax({
     		url: '/api/cli', 
     		type: 'POST', 
     		contentType: 'application/json', 
-    		data: {name: localStorage.getItem('name'), command: $('#cli').val()}
-    	});*/
+    		data: jsonString
+    	}).done(function(data){
+    		document.getElementById('output').textContent = data;
+    	});
 	};
 });

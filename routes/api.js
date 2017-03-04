@@ -8,13 +8,15 @@ var router = express.Router();
 var env = 'development';
 var config = require('../config')[env];
 
-var messages = {};
+var messages = {}; //TODO(torchhound) fix this fucked up shit
 
 //url for parsing commands
-router.post("/cli", jsonParser, function(req, res, next) { //TODO(torchhound) fix fucked up JSON parsing
+router.post("/cli", jsonParser, function(req, res, next) { 
 	console.log(req.body);
+	console.log('Pre-parse ' + messages);
 	messages = cli.parse(req.body, messages);
-	res.end(messages);
+	console.log('Post-parse ' + messages);
+	res.end(messages); //TODO(torchhound) not returning anything to client
 });
 
 //url for GETting messages
