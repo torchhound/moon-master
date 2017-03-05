@@ -1,7 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const underscore = require('underscore');
-const api = require('./routes/api');
+const cli = require('./tools/cli');
 const users = require('./routes/users');
 
 var env = 'development';
@@ -16,7 +16,6 @@ if(env == "development") {
 };
 app.engine('html', require('ejs').renderFile); 
 app.set('view engine', 'html');
-app.use('/api', api);
 app.use('/', users);
 app.use(express.static('views'));
 app.use(function(req, res) {
@@ -32,18 +31,7 @@ function logError(error, req, res, next){
 };
 
 io.on('connection', function(socket){
-  socket.on('command', function(msg){
-  	var json = JSON.parse(msg);
-  	if(json.command.slice(0, 1) != 't') {
-    	socket.emit('log', msg);
-	};
-  });
-  socket.on('command', function(msg){
-  	var json = JSON.parse(msg);
-  	if(json.command.slice(0, 1) == 't') {
-    	io.emit('chat', msg);
-	};
-  });
+  socket.on('command', cli.parse(socket, io));
 });
 
 http.listen(port, function() {

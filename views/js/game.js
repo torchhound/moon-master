@@ -13,7 +13,7 @@ $("#submit").click(function(){
 socket.on('log', function(msg){
 	var jsonOut = JSON.parse(msg);
 	var command = jsonOut.command;
-    $('#log').append($('<li>').text('action: ' + command + '\n'));
+    $('#log').append($('<li>').text(command + '\n'));
  });
 
 socket.on('chat', function(msg){
