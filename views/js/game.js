@@ -5,14 +5,20 @@ $("#submit").click(function(){
    	obj.name = localStorage.getItem('name');
    	obj.command  = $('#cli').val();
    	var jsonString= JSON.stringify(obj);
-    socket.emit('chat message', jsonString);
+    socket.emit('command', jsonString);
    $('#cli').val('');
     return false;
  });
 
-socket.on('chat message', function(msg){
+socket.on('log', function(msg){
+	var jsonOut = JSON.parse(msg);
+	var command = jsonOut.command;
+    $('#log').append($('<li>').text('action: ' + command + '\n'));
+ });
+
+socket.on('chat', function(msg){
 	var jsonOut = JSON.parse(msg);
 	var name = jsonOut.name;
 	var command = jsonOut.command;
-    $('#output').append($('<li>').text(name + ': ' + command + '\n'));
+    $('#chat').append($('<li>').text(name + ': ' + command + '\n'));
  });

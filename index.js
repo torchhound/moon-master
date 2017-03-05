@@ -32,8 +32,17 @@ function logError(error, req, res, next){
 };
 
 io.on('connection', function(socket){
-  socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
+  socket.on('command', function(msg){
+  	var json = JSON.parse(msg);
+  	if(json.command.slice(0, 1) != 't') {
+    	socket.emit('log', msg);
+	};
+  });
+  socket.on('command', function(msg){
+  	var json = JSON.parse(msg);
+  	if(json.command.slice(0, 1) == 't') {
+    	io.emit('chat', msg);
+	};
   });
 });
 
