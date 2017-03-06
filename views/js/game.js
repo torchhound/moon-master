@@ -6,7 +6,7 @@ $("#submit").click(function(){
    	obj.command  = $('#cli').val();
    	var jsonString= JSON.stringify(obj);
     socket.emit('command', jsonString);
-   $('#cli').val('');
+   	$('#cli').val('');
     return false;
  });
 

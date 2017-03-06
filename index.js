@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const underscore = require('underscore');
 const cli = require('./tools/cli');
 const users = require('./routes/users');
+const api = require('./routes/api');
 
 var env = 'development';
 var config = require('./config')[env];
@@ -31,7 +32,8 @@ function logError(error, req, res, next){
 };
 
 io.on('connection', function(socket){
-  socket.on('command', cli.parse(socket, io));
+	socket.on('newPlayer', api.newPlayer(socket, io));
+	socket.on('command', cli.parse(socket, io));
 });
 
 http.listen(port, function() {
