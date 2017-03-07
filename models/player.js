@@ -1,9 +1,10 @@
 module.exports = class Player {
 	constructor(name){
-		this.name = name;
+		this.namePrint = name;
+		this.name = name.toLowerCase();
 	};
 
 	examine() {
-		return this.name;
+		return this.namePrint;
 	}
 };
