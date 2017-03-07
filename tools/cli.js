@@ -32,6 +32,24 @@ exports.parse = function(socket, io) {
 		else if(commandSplit[0] == 'look' || commandSplit[0] == 'l' || commandSplit[0] == 'x' || commandSplit[0] == 'ex' ||commandSplit[0] == 'examine') {
 			if(commandSplit[1] == null) {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to examine"}));
+			} else if(commandSplit[1] == 'room'){
+				db.collection('rooms', function(err, collection) {
+					if(err) console.log(err);
+					collection.findOne({players:jsonOut.name}, function(err, document){
+         				if(err){
+         					console.log('Query Error: '+err);
+         					socket.emit('log', JSON.stringify({"command":"Room examine server failure"}));
+         				}
+         				else if(document) {
+         					var examineRoomOutput = JSON.stringify(document.name); //document.players?
+         					msg = JSON.stringify({"command":"examine: "+examineRoomOutput});
+         					socket.emit('log', msg);
+         				} else {
+         					console.log('Query Error: '+err);
+         					socket.emit('log', JSON.stringify({"command":"Room examine server failure"}));
+         				};
+         			});
+				});
 			} else {
 				db.collection('players', function(err, collection) {
 					if(err) console.log(err);
@@ -41,8 +59,8 @@ exports.parse = function(socket, io) {
          					socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to examine"}));
          				}
          				else if(document) {
-         					var examineOutput = JSON.stringify(document.namePrint);
-         					msg = JSON.stringify({"command":"examine: "+examineOutput});
+         					var examinePlayerOutput = JSON.stringify(document.namePrint);
+         					msg = JSON.stringify({"command":"examine: "+examinePlayerOutput});
          					socket.emit('log', msg);
          				} else {
          					console.log('Query Error: '+err);
