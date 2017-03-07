@@ -20,7 +20,7 @@ In the mongo.exe shell
 
 Exit the mongo shell but leave mongod.exe running while using the node.js/express.js server
 
-Finally run `node tools/initDb.js`
+Finally run `npm run init-db && npm run create-map`
 
 ###Install nodejs dependencies
 
@@ -40,7 +40,7 @@ Ensure that mongod.exe is running first.
 
 ##Cleaning MongoDB
 
-`node tools/cleanDb.js`
+`npm run clean-db && npm run create-map`
 
 Make sure you are in the correct db with `db` then check that collections are correct in mongo.exe with `show collections` which should return players, rooms, and test.
 

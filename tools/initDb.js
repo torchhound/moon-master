@@ -23,8 +23,9 @@ function createPlayers() {
 function createRooms() {
 	db.createCollection("rooms")
 		.then(function() {
-			console.log("Created collections");
+			console.log('Initialized db');
 			process.exit(0);
 		})
 		.catch(function (err) {console.log(err)});
 };
+

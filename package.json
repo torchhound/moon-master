@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "A Moon MUD",
   "main": "index.js",
-  "directories": {
-    "test": "node endpointTest.js; mocha"
-  },
   "scripts": {
-    "test": "mocha"
+    "test": "node tests/endpointTests.js",
+    "clean-db": "node tools/cleanDb.js",
+    "init-db": "node tools/initDb.js",
+    "create-map": "node tools/createMap.js"
   },
   "repository": {
     "type": "git",

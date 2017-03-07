@@ -1,6 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
 const Player = require('../models/player');
-const Room = require('../models/room');
 
 var env = 'development';
 var config = require('../config')[env];
@@ -17,17 +16,15 @@ MongoClient.connect(config.database.host, (error, database) => {
 
 var exports = module.exports = {};
 
-//parses commands
+//adds a new player to the db
 exports.newPlayer = function(socket, io) {
 	return function(msg){
 		var jsonOut = JSON.parse(msg);
 		var player = new Player(jsonOut.name);
-		var room = new Room('Spawn');
-		room.addPlayer(jsonOut.name);
 		db.collection('players').insertOne(player, function(err, records) { 
 			if (err) console.log(err);
 		});
-		db.collection('rooms').insertOne(room, function(err, records) { 
+		db.collection('rooms').findAndModify({name:"Spawn"}, [['_id','asc']], {$push: {players:jsonOut.name}}, {new:true}, function(err, records) { 
 			if (err) console.log(err);
 		});
 	};

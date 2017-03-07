@@ -28,6 +28,25 @@ exports.parse = function(socket, io) {
 			msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
     		io.emit('chat', msg);	
 		}
+		//If command is "move"
+		else if(commandSplit[0] == 'move') {
+			if(commandSplit[1] == null){
+				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to move to"}));
+			} else if(commandSplit[1] != null) {
+				db.collection('rooms').findAndModify({players:jsonOut.name}, [['_id','asc']], {$pull: {players:jsonOut.name}}, {new:true}).then(function() {
+					db.collection('rooms').findAndModify({name:commandSplit[1]}, [['_id','asc']], {$push: {players:jsonOut.name}}, {new:true}, function(err, records) { 
+						if (err) {
+							console.log(err);
+							socket.emit('log', JSON.stringify({"command":err}));
+						};
+						socket.emit('log', JSON.stringify({"command":jsonOut.name+" moved to "+commandSplit[1]}));
+					});
+				})
+				.catch(function (err) {console.log(err)});
+			} else {
+				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to move to"}));
+			}
+		}
 		//If command is "examine"
 		else if(commandSplit[0] == 'look' || commandSplit[0] == 'l' || commandSplit[0] == 'x' || commandSplit[0] == 'ex' ||commandSplit[0] == 'examine') {
 			if(commandSplit[1] == null) {
