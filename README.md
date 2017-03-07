@@ -38,7 +38,7 @@ Ensure that mongod.exe is running first.
 
 `npm test`
 
-#Cleaning MongoDB
+##Cleaning MongoDB
 
 `node tools/cleanDb.js`
 
