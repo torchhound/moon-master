@@ -8,9 +8,9 @@ Make sure you have an up to date `config.js`
 
 Download and install mongodb
 
-Run mongod.exe and then mongo.exe
+`mkdir C:data/db`
 
-`mkdir C:data/db'
+Run C:/Program Files/MongoDB/Server/3.4/bin/mongod.exe and then C:/Program Files/MongoDB/Server/3.4/bin/mongo.exe
 
 In the mongo.exe shell 
 
@@ -29,6 +29,8 @@ Finally run `node tools/initDb.js`
 `npm install -g nodemon`
 
 ##Running
+
+Ensure that mongod.exe is running first.
 
 `nodemon index.js`
 

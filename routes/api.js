@@ -24,13 +24,11 @@ exports.newPlayer = function(socket, io) {
 		var player = new Player(jsonOut.name);
 		var room = new Room('Spawn');
 		room.addPlayer(player);
-		db.collection('players').insertOne(player, function(err, records) { //TODO(torchhound) typeerror cannot read property '_id' of undefined
+		db.collection('players').insertOne(player, function(err, records) { 
 			if (err) console.log(err);
-			if (env == 'development') console.log("Record added as " + records[0]._id);
 		});
-		db.collection('rooms').insertOne(room, function(err, records) { //TODO(torchhound) typeerror cannot read property '_id' of undefined
+		db.collection('rooms').insertOne(room, function(err, records) { 
 			if (err) console.log(err);
-			if (env == 'development') console.log("Record added as " + records[0]._id);
 		});
 	};
 };
