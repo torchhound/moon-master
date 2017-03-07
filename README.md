@@ -2,6 +2,8 @@
 
 ##Installing
 
+Make sure you have an up to date `config.js`
+
 ###Install mongodb
 
 Run mongod.exe and then mongo.exe
@@ -10,7 +12,7 @@ In the mongo shell
 
 `use mmdb`
 
-'db.test.insert({"test":"test"})'
+`db.test.insert({"test":"test"})`
 
 Exit the mongo shell but leave mongod.exe running while using the node.js/express.js server
 
