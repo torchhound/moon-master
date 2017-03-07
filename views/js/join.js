@@ -10,6 +10,6 @@ $("#join-form").submit(function(){
 		var obj = new Object();
    		obj.name = localStorage.getItem('name');
    		var jsonString= JSON.stringify(obj);
-		//socket.emit('newPlayer', jsonString);
+		socket.emit('newPlayer', jsonString);
 	};
 });
