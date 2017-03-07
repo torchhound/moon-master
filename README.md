@@ -4,9 +4,9 @@
 
 Make sure you have an up to date `config.js`
 
-###Install mongodb
+###Install MongoDB
 
-Download and install mongodb
+Download and install MongoDB
 
 `mkdir C:data/db`
 
@@ -37,3 +37,11 @@ Ensure that mongod.exe is running first.
 ##Testing
 
 `npm test`
+
+#Cleaning MongoDB
+
+`node tools/cleanDb.js`
+
+Make sure you are in the correct db with `db` then check that collections are correct in mongo.exe with `show collections` which should return players, rooms, and test.
+
+Check that the collections are empty with `db.players.find({})` and `db.rooms.find({})`
