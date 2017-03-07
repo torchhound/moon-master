@@ -6,9 +6,13 @@ Make sure you have an up to date `config.js`
 
 ###Install mongodb
 
+Download and install mongodb
+
 Run mongod.exe and then mongo.exe
 
-In the mongo shell 
+`mkdir C:data/db'
+
+In the mongo.exe shell 
 
 `use mmdb`
 
