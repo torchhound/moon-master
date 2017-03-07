@@ -23,7 +23,7 @@ exports.newPlayer = function(socket, io) {
 		var jsonOut = JSON.parse(msg);
 		var player = new Player(jsonOut.name);
 		var room = new Room('Spawn');
-		room.addPlayer(player);
+		room.addPlayer(jsonOut.name);
 		db.collection('players').insertOne(player, function(err, records) { 
 			if (err) console.log(err);
 		});
