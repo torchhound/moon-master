@@ -25,7 +25,7 @@ exports.parse = function(socket, io) {
 		var commandSplit = jsonOut.command.toLowerCase().split(' ');
 		//If command is 't' or 'say' then 'Local Chat'
 		if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
-			msg = JSON.stringify({"namePrint":jsonOut.namePrint+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
+			msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
     		io.emit('chat', msg);	
 		}
 		//If command is "examine"

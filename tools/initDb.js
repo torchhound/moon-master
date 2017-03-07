@@ -11,6 +11,6 @@ MongoClient.connect(config.database.host, (error, database) => {
   		database.createCollection("players");
   		database.createCollection("rooms");
   		console.log("Created collections");
-  		process.exit();
+  		//process.exit(); //TODO(torchhound) Figure out how to sync this with database I/O completion
   	}
 });

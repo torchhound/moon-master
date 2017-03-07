@@ -18,7 +18,7 @@ socket.on('log', function(msg){
 
 socket.on('chat', function(msg){
 	var jsonOut = JSON.parse(msg);
-	var name = jsonOut.name;
+	var name = jsonOut.namePrint;
 	var command = jsonOut.command;
     $('#chat').append($('<li>').text(name + ': ' + command + '\n'));
  });
