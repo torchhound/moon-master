@@ -52,6 +52,7 @@ exports.parse = function(socket, io) {
 			if(commandSplit[1] == null) {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to examine"}));
 			} else if(commandSplit[1] == 'room'){
+				//Examine Room
 				db.collection('rooms', function(err, collection) {
 					if(err) console.log(err);
 					collection.findOne({players:jsonOut.name}, function(err, document){
@@ -70,6 +71,7 @@ exports.parse = function(socket, io) {
          			});
 				});
 			} else {
+				//Examine Player
 				db.collection('players', function(err, collection) {
 					if(err) console.log(err);
          			collection.findOne({name:commandSplit[1]}, function(err, document){
@@ -79,7 +81,12 @@ exports.parse = function(socket, io) {
          				}
          				else if(document) {
          					var examinePlayerOutput = JSON.stringify(document.namePrint);
-         					msg = JSON.stringify({"command":"examine: "+examinePlayerOutput});
+         					msg = JSON.stringify({"command":"Name: "+examinePlayerOutput});
+         					socket.emit('log', msg);
+							//msg = "Skills: ";
+							//for (int i = 0; i < document.skillsRank.length; i++) {
+							//msg = JSON.stringify({"command":document.skillName.grinding+": "+document.skillRank.grinding+" EXP: "+document.skillExp.grinding});
+							msg = JSON.stringify({"command":document.skillGrinding[0]+": Rank "+document.skillGrinding[1]+" (EXP: "+document.skillGrinding[2]+")"});
          					socket.emit('log', msg);
          				} else {
          					console.log('Query Error: '+err);
