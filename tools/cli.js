@@ -16,7 +16,7 @@ MongoClient.connect(config.database.host, (error, database) => {
 var exports = module.exports = {};
 
 //parses commands
-exports.parse = function(socket, io) {
+exports.parse = function(socket, io, clientLookup) {
 	return function(msg){
 		var jsonOut = JSON.parse(msg);
 		//commandSplit is each separate word of the command, which we will use to determine what actions the player wants to take.

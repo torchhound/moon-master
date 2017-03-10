@@ -1,7 +1,12 @@
 var socket = io();
 
+var loginObj = new Object();
+loginObj.name = localStorage.getItem('name');
+var loginJsonString= JSON.stringify(loginObj);
+socket.emit('login', loginJsonString);
+
 $("#submit").click(function(){
-	var obj = new Object();
+    var obj = new Object();
    	obj.name = localStorage.getItem('name');
    	obj.command  = $('#cli').val();
    	var jsonString= JSON.stringify(obj);

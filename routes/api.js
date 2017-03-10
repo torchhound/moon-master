@@ -16,9 +16,17 @@ MongoClient.connect(config.database.host, (error, database) => {
 
 var exports = module.exports = {};
 
+exports.login = function(socket, io, clientLookup) {
+	return function(msg) {
+		var jsonOut = JSON.parse(msg);
+		var potentialAdd = {name:jsonOut.name.toLowerCase(), socketId:socket.id};
+		clientLookup.indexOf(potentialAdd) === -1 ? clientLookup.push(potentialAdd) : console.log("Client already exists in array");
+	};
+};
+
 //adds a new player to the db
 exports.newPlayer = function(socket, io) {
-	return function(msg){
+	return function(msg) {
 		var jsonOut = JSON.parse(msg);
 		var player = new Player(jsonOut.name);
 		db.collection('players').update({name:player.name}, player, {upsert:true})
