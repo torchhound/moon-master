@@ -82,8 +82,7 @@ exports.parse = function(socket, io, clientLookup, players) {
          					players.forEach(function(result, index) {
          						var playerOut = JSON.parse(result);
     							if(playerOut.namePrint === commandSplit[1]) {
-    								var examinePlayerOutput = JSON.stringify(playerOut.namePrint);
-         							msg = JSON.stringify({"command":"Name: "+examinePlayerOutput});
+         							msg = JSON.stringify({"command":"Name: "+playerOut.namePrint});
          							socket.emit('log', msg);
 									//msg = "Skills: ";
 									//for (int i = 0; i < document.skillsRank.length; i++) {
