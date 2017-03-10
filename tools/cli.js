@@ -57,29 +57,23 @@ exports.parse = function(socket, io, clientLookup, players) {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to examine"}));
 			} else if(commandSplit[1] == 'room'){
 				//Examine Room
-				db.collection('rooms', function(err, collection) {
-					if(err) console.log(err);
-					collection.findOne({players:jsonOut.name}, function(err, document){
-         				if(err){
-         					console.log('Query Error: '+err);
-         					socket.emit('log', JSON.stringify({"command":"Room examine server failure"}));
-         				}
-         				else if(document) {
-         					var examineRoomOutput = JSON.stringify(document.name); //document.players?
-         					msg = JSON.stringify({"command":"examine: "+examineRoomOutput});
-         					socket.emit('log', msg);
-         				} else {
-         					console.log('Query Error: '+err);
-         					socket.emit('log', JSON.stringify({"command":"Room examine server failure"}));
-         				};
-         			});
-				});
-			} else {
-				//Examine Player
-				console.log('map: '+mapOut.rooms);
+				//console.log('map: '+mapOut.rooms);
 				for(var x in mapOut.rooms) {
 					var roomOut = JSON.parse(mapOut.rooms[x]);
-					console.log(roomOut.name+' players: '+roomOut.players);
+					//console.log(roomOut.name+' players: '+roomOut.players);
+					for(var y in roomOut.players) {
+						if(jsonOut.name.toLowerCase() === roomOut.players[y]) {
+         					msg = JSON.stringify({"command":"examine: "+roomOut.name});
+         					socket.emit('log', msg);
+    					};
+         			};
+    			};			
+			} else {
+				//Examine Player
+				//console.log('map: '+mapOut.rooms);
+				for(var x in mapOut.rooms) {
+					var roomOut = JSON.parse(mapOut.rooms[x]);
+					//console.log(roomOut.name+' players: '+roomOut.players);
 					for(var y in roomOut.players) {
 						if(commandSplit[1] === roomOut.players[y]) {
          					players.forEach(function(result, index) {
@@ -87,9 +81,6 @@ exports.parse = function(socket, io, clientLookup, players) {
     							if(playerOut.namePrint === commandSplit[1]) {
          							msg = JSON.stringify({"command":"Name: "+playerOut.namePrint});
          							socket.emit('log', msg);
-									//msg = "Skills: ";
-									//for (int i = 0; i < document.skillsRank.length; i++) {
-									//msg = JSON.stringify({"command":document.skillName.grinding+": "+document.skillRank.grinding+" EXP: "+document.skillExp.grinding});
 									msg = JSON.stringify({"command":playerOut.skillGrinding[0]+": Rank "+playerOut.skillGrinding[1]+" (EXP: "+playerOut.skillGrinding[2]+")"});
          							socket.emit('log', msg);
     							};
