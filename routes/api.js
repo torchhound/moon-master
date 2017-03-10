@@ -29,9 +29,9 @@ exports.newPlayer = function(socket, io, players) {
 		var playerIn = JSON.stringify(player);
 		players.indexOf(playerIn) === -1 ? players.push(playerIn) : console.log('newPlayer: Player already exists in array');
 		console.log(mapOut);
-		var spawnOut = JSON.parse(mapOut.rooms[0]);
+		var spawnOut = JSON.parse(mapOut.map[0][0]);
 		spawnOut.players.indexOf(jsonOut.name.toLowerCase()) === -1 ? spawnOut.players.push(jsonOut.name.toLowerCase()) : console.log('newPlayer: Player already exists in spawn');
-		mapOut.rooms[0] = JSON.stringify(spawnOut);
+		mapOut.map[0][0] = JSON.stringify(spawnOut);
 		console.log(mapOut);
 		fs.writeFileSync(mapFile, JSON.stringify(mapOut));
 	};

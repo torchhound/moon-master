@@ -9,8 +9,7 @@ exports.create = function() {
 	var spawnIn = JSON.stringify(spawn);
 	var factoryIn = JSON.stringify(factory);
 	var newMap = new Object();
-	newMap.map = [['spawn', 'factory']];
-	newMap.rooms = [spawnIn, factoryIn];
+	newMap.map = [[spawnIn, factoryIn], [factoryIn, factoryIn]];
 	var newMapIn = JSON.stringify(newMap);
 	fs.writeFileSync('map.json', newMapIn);
 	console.log('Created map');
