@@ -16,25 +16,21 @@ MongoClient.connect(config.database.host, (error, database) => {
 
 var exports = module.exports = {};
 
-exports.login = function(socket, io, clientLookup) {
+exports.login = function(socket, io, clientLookup) { //TODO(torchhound) add Player to players if they do not already exist, handles disconnect reconnect scenario
 	return function(msg) {
 		var jsonOut = JSON.parse(msg);
 		var potentialAdd = {name:jsonOut.name.toLowerCase(), socketId:socket.id};
-		clientLookup.indexOf(potentialAdd) === -1 ? clientLookup.push(potentialAdd) : console.log("Client already exists in array");
+		clientLookup.indexOf(potentialAdd) === -1 ? clientLookup.push(potentialAdd) : console.log('Client already exists in array');
 	};
 };
 
 //adds a new player to the db
-exports.newPlayer = function(socket, io) {
+exports.newPlayer = function(socket, io, players) {
 	return function(msg) {
 		var jsonOut = JSON.parse(msg);
 		var player = new Player(jsonOut.name);
-		db.collection('players').update({name:player.name}, player, {upsert:true})
-			.then(function() {
-				db.collection('rooms').findAndModify({name:"spawn"}, [['_id','asc']], {$push: {players:player.name}}, {new:true}, function(err, records) { 
-					if (err) console.log(err);
-				});
-			})
-			.catch(function (err) {console.log(err)});
+		var playerIn = JSON.stringify(player);
+		players.indexOf(playerIn) === -1 ? players.push(playerIn) : console.log('Player already exists in array')
+		console.log(players);
 	};
 };

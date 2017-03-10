@@ -35,14 +35,19 @@ function logError(error, req, res, next){
 
 io.on('connection', function(socket){
 	socket.on('login', api.login(socket, io, clientLookup));
-	socket.on('newPlayer', api.newPlayer(socket, io));
-	socket.on('command', cli.parse(socket, io, clientLookup));
+	socket.on('newPlayer', api.newPlayer(socket, io, players));
+	socket.on('command', cli.parse(socket, io, clientLookup, players));
 	socket.on('disconnect', function(){
     	clientLookup.forEach(function(result, index) {
     		if(result.socketId === socket.id) {
     			clientLookup.splice(index, 1);
     		};
-    	});
+    	});/* remove Player from players array on disconnect
+    	players.forEach(function(result, index) {
+    		if(result.socketId === socket.id) {
+    			clientLookup.splice(index, 1);
+    		};
+    	});*/
   	});
 });
 

@@ -16,7 +16,7 @@ MongoClient.connect(config.database.host, (error, database) => {
 var exports = module.exports = {};
 
 //parses commands
-exports.parse = function(socket, io, clientLookup) {
+exports.parse = function(socket, io, clientLookup, players) {
 	return function(msg){
 		var jsonOut = JSON.parse(msg);
 		//commandSplit is each separate word of the command, which we will use to determine what actions the player wants to take.
@@ -79,27 +79,18 @@ exports.parse = function(socket, io, clientLookup) {
          					console.log('Query Error: '+err);
          					socket.emit('log', JSON.stringify({"command":"Room examine server failure"}));
          				} else if(document) {
-         					db.collection('players', function(err, collection) {
-								if(err) console.log(err);
-         						collection.findOne({name:commandSplit[1]}, function(err, document){
-         							if(err){
-         								console.log('Query Error: '+err);
-         								socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to examine"}));
-         							}
-         							else if(document) {
-         								var examinePlayerOutput = JSON.stringify(document.namePrint);
-         								msg = JSON.stringify({"command":"Name: "+examinePlayerOutput});
-         								socket.emit('log', msg);
-										//msg = "Skills: ";
-										//for (int i = 0; i < document.skillsRank.length; i++) {
-										//msg = JSON.stringify({"command":document.skillName.grinding+": "+document.skillRank.grinding+" EXP: "+document.skillExp.grinding});
-										msg = JSON.stringify({"command":document.skillGrinding[0]+": Rank "+document.skillGrinding[1]+" (EXP: "+document.skillGrinding[2]+")"});
-         								socket.emit('log', msg);
-         							} else {
-         								console.log('Query Error: '+err);
-         								socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to examine"}));
-         							};
-         						});
+         					players.forEach(function(result, index) {
+         						var playerOut = JSON.parse(result);
+    							if(playerOut.namePrint === commandSplit[1]) {
+    								var examinePlayerOutput = JSON.stringify(playerOut.namePrint);
+         							msg = JSON.stringify({"command":"Name: "+examinePlayerOutput});
+         							socket.emit('log', msg);
+									//msg = "Skills: ";
+									//for (int i = 0; i < document.skillsRank.length; i++) {
+									//msg = JSON.stringify({"command":document.skillName.grinding+": "+document.skillRank.grinding+" EXP: "+document.skillExp.grinding});
+									msg = JSON.stringify({"command":playerOut.skillGrinding[0]+": Rank "+playerOut.skillGrinding[1]+" (EXP: "+playerOut.skillGrinding[2]+")"});
+         							socket.emit('log', msg);
+    							};
     						});
          				} else {
          					console.log('Query Error: '+err);
