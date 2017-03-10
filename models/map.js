@@ -12,6 +12,6 @@ exports.create = function() {
 	newMap.map = [['spawn', 'factory']];
 	newMap.rooms = [spawnIn, factoryIn];
 	var newMapIn = JSON.stringify(newMap);
-	fs.writeFile('map.json', newMapIn);
+	fs.writeFileSync('map.json', newMapIn);
 	console.log('Created map');
 };

@@ -27,7 +27,7 @@ app.use(function(req, res) {
     res.render("not-found.html");
  });
 app.use(logError);
-map.create();
+map.create(); //TODO(torchhound) does not actually replace map OR DOES IT I THINK IT DOES WHY DEAR GOD DEHUMANIZE YOURSELF AND FACE TO BLOODSHED
 
 //Logs errors to console
 function logError(error, req, res, next){
@@ -42,13 +42,13 @@ io.on('connection', function(socket){
 	socket.on('disconnect', function(){
     	clientLookup.forEach(function(result, index) {
     		if(result.socketId === socket.id) {
-    			clientLookup.splice(index, 1);
+    			clientLookup.splice(index, 1);/*
     			for(var x in players) {
     				var playerOut = JSON.parse(players[x]);
     				if(result.name === playerOut.name) {
     					players.splice(x, 1);
     				};
-    			};
+    			};*/
     		};
     	});
   	});

@@ -1,4 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
+const fs = require('fs');
 
 var env = 'development';
 var config = require('../config')[env];
@@ -18,6 +19,9 @@ var exports = module.exports = {};
 //parses commands
 exports.parse = function(socket, io, clientLookup, players) {
 	return function(msg){
+		var mapFile = './map.json';
+		var map = fs.readFileSync(mapFile);
+		var mapOut = JSON.parse(map);
 		var jsonOut = JSON.parse(msg);
 		//commandSplit is each separate word of the command, which we will use to determine what actions the player wants to take.
 		//commandSplit is also put in lowercase for comparison with command words, which should all be lower case.
@@ -72,13 +76,12 @@ exports.parse = function(socket, io, clientLookup, players) {
 				});
 			} else {
 				//Examine Player
-				db.collection('rooms', function(err, collection) {
-					if(err) console.log(err);
-					collection.findOne({$and: [{players:commandSplit[1]}, {players:jsonOut.name.toLowerCase()}]}, function(err, document){ 
-         				if(err){
-         					console.log('Query Error: '+err);
-         					socket.emit('log', JSON.stringify({"command":"Room examine server failure"}));
-         				} else if(document) {
+				console.log('map: '+mapOut.rooms);
+				for(var x in mapOut.rooms) {
+					var roomOut = JSON.parse(mapOut.rooms[x]);
+					console.log(roomOut.name+' players: '+roomOut.players);
+					for(var y in roomOut.players) {
+						if(commandSplit[1] === roomOut.players[y]) {
          					players.forEach(function(result, index) {
          						var playerOut = JSON.parse(result);
     							if(playerOut.namePrint === commandSplit[1]) {
@@ -91,12 +94,9 @@ exports.parse = function(socket, io, clientLookup, players) {
          							socket.emit('log', msg);
     							};
     						});
-         				} else {
-         					console.log('Query Error: '+err);
-         					socket.emit('log', JSON.stringify({"command":"Room examine server failure"}));
          				};
-         			});
-				});
+    				};
+    			};
 			};
 		}
 		//If command is not a valid command
