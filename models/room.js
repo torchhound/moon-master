@@ -14,7 +14,7 @@ module.exports = class Room {
 	}
 
 	removePlayer(player) { 
-		this.indexOf(player) === -1 ? return false : delete this.players[rm];
+		this.indexOf(player) === -1 ? console.log('Player cannot be removed because they do not exist') : delete this.players[rm];
 	}
 
 	examine() {

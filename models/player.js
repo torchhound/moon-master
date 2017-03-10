@@ -10,5 +10,4 @@ module.exports = class Player {
 		return this.namePrint;
 	}
 	
-	
 };

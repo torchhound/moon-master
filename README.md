@@ -32,7 +32,7 @@ Finally run `npm run init-db && npm run create-map`
 
 Ensure that mongod.exe is running first.
 
-`nodemon index.js`
+`nodemon`
 
 ##Testing
 

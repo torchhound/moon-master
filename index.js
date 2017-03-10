@@ -4,6 +4,7 @@ const underscore = require('underscore');
 const cli = require('./tools/cli');
 const users = require('./routes/users');
 const api = require('./routes/api');
+const map = require('./models/map');
 
 var env = 'development';
 var config = require('./config')[env];
@@ -26,6 +27,7 @@ app.use(function(req, res) {
     res.render("not-found.html");
  });
 app.use(logError);
+map.create();
 
 //Logs errors to console
 function logError(error, req, res, next){
