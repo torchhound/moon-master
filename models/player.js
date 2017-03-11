@@ -2,8 +2,13 @@ module.exports = class Player {
 	constructor(name){
 		this.namePrint = name;
 		this.name = name.toLowerCase();
-		//A skill array is made up of 0: Printed name, 1: Rank in the skill, 2: EXP in the skill
-		this.skillGrinding = ["Grinding", 1, 0];
+		//Skills are stored in an array so that they may be indexed through. For example, for printing info on skills, reducing all experience on death,
+		//Or whatever other purposes you can think of.
+		this.skills = ["grinding", "imgay", "fakeskill"];
+		//A skill object is made up of Printed name, 1: Rank in the skill, 2: EXP in the skill
+		this.skills[0] = {name:"Grinding", rank:1, exp:0}
+		this.skills[1] = {name:"im gay", rank:1, exp:0}
+		this.skills[2] = {name:"fakeskill", rank:1, exp:0}
 		this.position = [0, 0];
 	};	
 };

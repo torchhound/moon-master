@@ -1,4 +1,5 @@
 const fs = require('fs');
+const playerTools = require('./playerTools');
 
 var env = 'development';
 var config = require('../config')[env];
@@ -20,6 +21,36 @@ exports.parse = function(socket, io, clientLookup, players) {
 		if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
 			msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
     		io.emit('chat', msg);	
+		}
+		//If command is "grind" Temporary skill-usage command. This command just butchers 'examine' code, and should not be used to base other skills on.
+		else if(commandSplit[0] === 'grind') {
+			if(commandSplit[1] == null) {
+				socket.emit('log', JSON.stringify({"command":"Enter your own name to grind because im gay"}));
+			} else {
+				//Examine Player
+				//console.log('map: '+mapOut.map);
+				for(var x = 0; x < mapOut.map.length; x++) {
+					var row = mapOut.map[x];
+					for(var y = 0; y < row.length; y++) {
+						var roomOut = JSON.parse(row[y]);
+						//console.log(roomOut.name+' players: '+roomOut.players);
+						for(var y in roomOut.players) {
+							if(commandSplit[1] === roomOut.players[y]) {
+         						players.forEach(function(result, index) {
+         							var playerOut = JSON.parse(result);
+    								if(playerOut.namePrint === commandSplit[1]) {
+         								msg = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
+										//Success Condition
+										if (msg == "")
+											msg = "Success!";
+										socket.emit('log', JSON.stringify({"command":msg}));
+    								};
+    							});
+         					};
+    					};
+    				};
+    			};
+			};
 		}
 		//If command is "move"
 		else if(commandSplit[0] === 'move') {
@@ -131,7 +162,7 @@ exports.parse = function(socket, io, clientLookup, players) {
 		//If command is "examine"
 		else if(commandSplit[0] === 'look' || commandSplit[0] === 'l' || commandSplit[0] === 'x' || commandSplit[0] === 'ex' ||commandSplit[0] === 'examine') {
 			if(commandSplit[1] == null) {
-				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to examine"}));
+				socket.emit('log', JSON.stringify({"command":"You must specify what you want to look at!"}));
 			} else if(commandSplit[1] === 'room'){
 				//Examine Room
 				//console.log('map: '+mapOut.map);
@@ -163,8 +194,10 @@ exports.parse = function(socket, io, clientLookup, players) {
     								if(playerOut.namePrint === commandSplit[1]) {
          								msg = JSON.stringify({"command":"Name: "+playerOut.namePrint});
          								socket.emit('log', msg);
-										msg = JSON.stringify({"command":playerOut.skillGrinding[0]+": Rank "+playerOut.skillGrinding[1]+" (EXP: "+playerOut.skillGrinding[2]+")"});
-         								socket.emit('log', msg);
+										for (i = 0; i < playerOut.skills.length; i++) {
+											msg = JSON.stringify({"command":playerOut.skills[i].name+": Rank "+playerOut.skills[i].rank+" (EXP: "+playerOut.skills[i].exp+")"});
+											socket.emit('log', msg);
+										}
     								};
     							});
          					};
