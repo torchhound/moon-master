@@ -99,7 +99,7 @@ exports.parse = function(socket, io, clientLookup, players) {
 						p2 = position[1];
 					var oldRoomOut = JSON.parse(mapOut.map[p1][p2]);
 					var pTest = position[0] + 1;
-					if(pTest > mapOut.map.length) { 
+					if(pTest > mapOut.map.length - 1) { 
 						socket.emit('log', JSON.stringify({"command":"Cannot go any farther south"}));
 						return false;
 					};
@@ -128,7 +128,7 @@ exports.parse = function(socket, io, clientLookup, players) {
 						p2 = position[1];
 					var oldRoomOut = JSON.parse(mapOut.map[p1][p2]);
 					var pTest = position[1] + 1;
-					if(pTest  > mapOut.map.length) {
+					if(pTest  > mapOut.map.length - 1) {
 						socket.emit('log', JSON.stringify({"command":"Cannot go any farther east"}));
 						return false;
 					};
