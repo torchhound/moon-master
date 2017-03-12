@@ -29,11 +29,11 @@ exports.parse = function(socket, io, clientLookup, players) {
 			} else {
 				//Examine Player
 				//console.log('map: '+mapOut.map);
-				foundPlayer = false;
+				var foundPlayer = false;
 				for(var coordX = 0; coordX < mapOut.map.length; coordX++) {
 					var row = mapOut.map[coordX];
-					for(var coordy = 0; coordy < row.length; coordy++) {
-						var roomOut = JSON.parse(row[coordy]);
+					for(var coordY = 0; coordY < row.length; coordY++) {
+						var roomOut = JSON.parse(row[coordY]);
 						//console.log(roomOut.name+' players: '+roomOut.players);
 						for(var p in roomOut.players) {
 							if(commandSplit[1] === roomOut.players[p]) {
@@ -41,6 +41,7 @@ exports.parse = function(socket, io, clientLookup, players) {
 								players.forEach(function(result, index) {
 									var playerOut = JSON.parse(result);
 									if(playerOut.namePrint.toLowerCase() === commandSplit[1]) {
+										//TODO(Gosts) Make skill check and skill increase two unrelated functions, return the needed numbers, modify player, convert back to json, replace index
 										msg = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
 										//Success Condition
 										if (msg == "")
@@ -219,11 +220,11 @@ exports.parse = function(socket, io, clientLookup, players) {
 			} else {
 				//Examine Player
 				//console.log('map: '+mapOut.map);
-				foundPlayer = false;
+				var foundPlayer = false;
 				for(var coordX = 0; coordX < mapOut.map.length; coordX++) {
 					var row = mapOut.map[coordX];
-					for(var coordy = 0; coordy < row.length; coordy++) {
-						var roomOut = JSON.parse(row[coordy]);
+					for(var coordY = 0; coordY < row.length; coordY++) {
+						var roomOut = JSON.parse(row[coordY]);
 						//console.log(roomOut.name+' players: '+roomOut.players);
 						for(var p in roomOut.players) {
 							if(commandSplit[1] === roomOut.players[p]) {
