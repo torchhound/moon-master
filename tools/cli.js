@@ -139,7 +139,7 @@ exports.parse = function(socket, io, clientLookup, players) {
 							fs.writeFileSync(mapFile, JSON.stringify(mapOut));
          				};
     				};
-    				position[0]++;
+    				position[1]++;
     				p1 = position[0], 
 					p2 = position[1];
     				var newRoomOut = JSON.parse(mapOut.map[p1][p2]);
@@ -167,7 +167,7 @@ exports.parse = function(socket, io, clientLookup, players) {
 							fs.writeFileSync(mapFile, JSON.stringify(mapOut));
          				};
     				};
-    				position[0]--;
+    				position[1]--;
     				p1 = position[0], 
 					p2 = position[1];
     				var newRoomOut = JSON.parse(mapOut.map[p1][p2]);
