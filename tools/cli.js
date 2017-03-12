@@ -29,27 +29,29 @@ exports.parse = function(socket, io, clientLookup, players) {
 			} else {
 				//Examine Player
 				//console.log('map: '+mapOut.map);
-				for(var x = 0; x < mapOut.map.length; x++) {
-					var row = mapOut.map[x];
-					for(var y = 0; y < row.length; y++) {
-						var roomOut = JSON.parse(row[y]);
+				foundPlayer = false;
+				for(var coordX = 0; coordX < mapOut.map.length; coordX++) {
+					var row = mapOut.map[coordX];
+					for(var coordy = 0; coordy < row.length; coordy++) {
+						var roomOut = JSON.parse(row[coordy]);
 						//console.log(roomOut.name+' players: '+roomOut.players);
-						for(var y in roomOut.players) {
-							if(commandSplit[1] === roomOut.players[y]) {
-         						players.forEach(function(result, index) {
-         							var playerOut = JSON.parse(result);
-    								if(playerOut.namePrint === commandSplit[1]) {
-         								msg = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
+						for(var p in roomOut.players) {
+							if(commandSplit[1] === roomOut.players[p]) {
+								foundPlayer = true;
+								players.forEach(function(result, index) {
+									var playerOut = JSON.parse(result);
+									if(playerOut.namePrint.toLowerCase() === commandSplit[1]) {
+										msg = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
 										//Success Condition
 										if (msg == "")
 											msg = "Success!";
 										socket.emit('log', JSON.stringify({"command":msg}));
-    								};
-    							});
-         					};
-    					};
-    				};
-    			};
+									};
+								});
+							};
+						};
+					};
+				};
 			};
 		}
 		//If command is "move"
@@ -217,28 +219,34 @@ exports.parse = function(socket, io, clientLookup, players) {
 			} else {
 				//Examine Player
 				//console.log('map: '+mapOut.map);
-				for(var x = 0; x < mapOut.map.length; x++) {
-					var row = mapOut.map[x];
-					for(var y = 0; y < row.length; y++) {
-						var roomOut = JSON.parse(row[y]);
+				foundPlayer = false;
+				for(var coordX = 0; coordX < mapOut.map.length; coordX++) {
+					var row = mapOut.map[coordX];
+					for(var coordy = 0; coordy < row.length; coordy++) {
+						var roomOut = JSON.parse(row[coordy]);
 						//console.log(roomOut.name+' players: '+roomOut.players);
-						for(var y in roomOut.players) {
-							if(commandSplit[1] === roomOut.players[y]) {
-         						players.forEach(function(result, index) {
-         							var playerOut = JSON.parse(result);
-    								if(playerOut.namePrint === commandSplit[1]) {
-         								msg = JSON.stringify({"command":"Name: "+playerOut.namePrint});
-         								socket.emit('log', msg);
+						for(var p in roomOut.players) {
+							if(commandSplit[1] === roomOut.players[p]) {
+								foundPlayer = true;
+								players.forEach(function(result, index) {
+									var playerOut = JSON.parse(result);
+									if(playerOut.namePrint.toLowerCase() === commandSplit[1]) {
+										msg = JSON.stringify({"command":"Name: "+playerOut.namePrint});
+										socket.emit('log', msg);
 										for (i = 0; i < playerOut.skills.length; i++) {
 											msg = JSON.stringify({"command":playerOut.skills[i].name+": Rank "+playerOut.skills[i].rank+" (EXP: "+playerOut.skills[i].exp+")"});
 											socket.emit('log', msg);
 										}
-    								};
-    							});
-         					};
-    					};
-    				};
-    			};
+									};
+								});
+							};
+						};
+					};
+				};
+				if (foundPlayer == false) {
+					msg = JSON.stringify({"command":"There is no such thing to look at!"});
+					socket.emit('log', msg);
+				};
 			};
 		}
 		//If command is not a valid command
