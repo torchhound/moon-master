@@ -86,18 +86,20 @@ exports.parse = function(socket, io, clientLookup, players) {
 					p2 = position[1];
     				var newRoomOut = JSON.parse(mapOut.map[p1][p2]);
     				if(newRoomOut.players.indexOf(jsonOut.name.toLowerCase()) === -1) {
-    					console.log('move north: Player already exists in room');
-    				} else {
     					newRoomOut.players.push(jsonOut.name.toLowerCase());
     					mapOut.map[p1][p2] = JSON.stringify(newRoomOut);
 						fs.writeFileSync(mapFile, JSON.stringify(mapOut));
 						socket.emit('log', JSON.stringify({"command":"You moved north"}));
+    				} else {
+    					console.log('move north: Player already exists in room');
+    					socket.emit('log', JSON.stringify({'command':'move north: server error'}));
     				};
 				} else if(commandSplit[1] === 's' || commandSplit[1] === 'south') {
 					var p1 = position[0], 
 						p2 = position[1];
 					var oldRoomOut = JSON.parse(mapOut.map[p1][p2]);
-					if(position[0]++ > mapOut.map.length) { //TODO(torchhound) change this so increment does not actually increment position[0]
+					var pTest = position[0] + 1;
+					if(pTest > mapOut.map.length) { 
 						socket.emit('log', JSON.stringify({"command":"Cannot go any farther south"}));
 						return false;
 					};
@@ -108,26 +110,25 @@ exports.parse = function(socket, io, clientLookup, players) {
 							fs.writeFileSync(mapFile, JSON.stringify(mapOut));
          				};
     				};
-    				console.log('before inc position[0] '+position[0]);
     				position[0]++;
-    				console.log('after inc position[0] '+position[0]);
     				p1 = position[0], 
 					p2 = position[1];
-					console.log('inter p1, p2 '+p1+' '+p2);
     				var newRoomOut = JSON.parse(mapOut.map[p1][p2]);
     				if(newRoomOut.players.indexOf(jsonOut.name.toLowerCase()) === -1) {
-    					console.log('move south: Player already exists in room');
-    				} else {
     					newRoomOut.players.push(jsonOut.name.toLowerCase());
     					mapOut.map[p1][p2] = JSON.stringify(newRoomOut);
 						fs.writeFileSync(mapFile, JSON.stringify(mapOut));
 						socket.emit('log', JSON.stringify({"command":"You moved south"}));
+    				} else {
+    					console.log('move south: Player already exists in room');
+    					socket.emit('log', JSON.stringify({'command':'move south: server error'}));
     				};
 				} else if(commandSplit[1] === 'e' || commandSplit[1] === 'east') {
 					var p1 = position[0], 
 						p2 = position[1];
 					var oldRoomOut = JSON.parse(mapOut.map[p1][p2]);
-					if(position[1]++ > mapOut.map.length) {
+					var pTest = position[1] + 1;
+					if(pTest  > mapOut.map.length) {
 						socket.emit('log', JSON.stringify({"command":"Cannot go any farther east"}));
 						return false;
 					};
@@ -143,12 +144,13 @@ exports.parse = function(socket, io, clientLookup, players) {
 					p2 = position[1];
     				var newRoomOut = JSON.parse(mapOut.map[p1][p2]);
     				if(newRoomOut.players.indexOf(jsonOut.name.toLowerCase()) === -1) {
-    					console.log('move east: Player already exists in room');
-    				} else {
     					newRoomOut.players.push(jsonOut.name.toLowerCase());
     					mapOut.map[p1][p2] = JSON.stringify(newRoomOut);
 						fs.writeFileSync(mapFile, JSON.stringify(mapOut));
 						socket.emit('log', JSON.stringify({"command":"You moved east"}));
+    				} else {
+    					console.log('move east: Player already exists in room');
+    					socket.emit('log', JSON.stringify({'command':'move east: server error'}));
     				};
 				} else if(commandSplit[1] === 'w' || commandSplit[1] === 'west') {
 					var p1 = position[0], 
@@ -170,12 +172,13 @@ exports.parse = function(socket, io, clientLookup, players) {
 					p2 = position[1];
     				var newRoomOut = JSON.parse(mapOut.map[p1][p2]);
     				if(newRoomOut.players.indexOf(jsonOut.name.toLowerCase()) === -1) {
-    					console.log('move west: Player already exists in room');
-    				} else {
     					newRoomOut.players.push(jsonOut.name.toLowerCase());
     					mapOut.map[p1][p2] = JSON.stringify(newRoomOut);
 						fs.writeFileSync(mapFile, JSON.stringify(mapOut));
 						socket.emit('log', JSON.stringify({"command":"You moved west"}));
+    				} else {
+    					console.log('move west: Player already exists in room');
+    					socket.emit('log', JSON.stringify({'command':'move west: server error'}));
     				};
 				};
 				players.forEach(function(result, index) {
