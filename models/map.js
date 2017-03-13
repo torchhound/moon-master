@@ -11,6 +11,12 @@ exports.create = function() {
 	var newMap = new Object();
 	newMap.map = [[spawnIn, factoryIn], [factoryIn, factoryIn]];
 	var newMapIn = JSON.stringify(newMap);
-	fs.writeFileSync('map.json', newMapIn);
-	console.log('Created map');
+	try {
+		fs.writeFileSync('map.json', newMapIn);
+		console.log('Created map');
+		return true;
+	} catch(err) {
+		console.log('Map creation error: '+err);
+		return false;
+	};
 };

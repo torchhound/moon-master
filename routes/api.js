@@ -1,10 +1,6 @@
 const Player = require('../models/player');
 const fs = require('fs');
 
-var mapFile = './map.json';
-var map = fs.readFileSync(mapFile);
-var mapOut = JSON.parse(map);
-
 var env = 'development';
 var config = require('../config')[env];
 
@@ -12,6 +8,9 @@ var exports = module.exports = {};
 
 exports.login = function(socket, io, clientLookup, players) { 
 	return function(msg) {
+		var mapFile = './map.json';
+		var map = fs.readFileSync(mapFile);
+		var mapOut = JSON.parse(map);
 		var jsonOut = JSON.parse(msg);
 		var potentialAdd = {name:jsonOut.name.toLowerCase(), socketId:socket.id};
 		clientLookup.indexOf(potentialAdd) === -1 ? clientLookup.push(potentialAdd) : console.log('login: Client already exists in array');
@@ -24,6 +23,9 @@ exports.login = function(socket, io, clientLookup, players) {
 //adds a new Player to players and to spawn.players
 exports.newPlayer = function(socket, io, players) {
 	return function(msg) {
+		var mapFile = './map.json';
+		var map = fs.readFileSync(mapFile);
+		var mapOut = JSON.parse(map);
 		var jsonOut = JSON.parse(msg);
 		var player = new Player(jsonOut.name);
 		var playerIn = JSON.stringify(player);
