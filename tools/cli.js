@@ -64,12 +64,10 @@ exports.parse = function(socket, io, clientLookup, players) {
 				socket.emit('log', JSON.stringify({"command":"You must specify what you want to look at!"}));
 			} else if(commandSplit[1] === 'room'){
 				//Examine Room
-				//console.log('map: '+mapOut.map);
 				for(var x = 0; x < mapOut.map.length; x++) {
 					var row = mapOut.map[x];
 					for(var y = 0; y < row.length; y++) {
 						var roomOut = JSON.parse(row[y]);
-						//console.log(roomOut.name+' players: '+roomOut.players);
 						for(var y in roomOut.players) {
 							if(jsonOut.name.toLowerCase() === roomOut.players[y]) {
          						msg = JSON.stringify({"command":"examine: "+roomOut.name});
@@ -80,13 +78,19 @@ exports.parse = function(socket, io, clientLookup, players) {
     			};			
 			} else {
 				//Examine Player
-				//console.log('map: '+mapOut.map);
+				var position;
+				players.forEach(function(result, index) {
+					var playerOut = JSON.parse(result);
+					if(commandSplit[1] === playerOut.name) {
+						position = playerOut.position;
+					};
+				});
+				console.log('position: '+position);
 				var foundPlayer = false;
 				for(var coordX = 0; coordX < mapOut.map.length; coordX++) {
 					var row = mapOut.map[coordX];
 					for(var coordY = 0; coordY < row.length; coordY++) {
 						var roomOut = JSON.parse(row[coordY]);
-						//console.log(roomOut.name+' players: '+roomOut.players);
 						for(var p in roomOut.players) {
 							if(commandSplit[1] === roomOut.players[p]) {
 								foundPlayer = true;
