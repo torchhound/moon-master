@@ -22,34 +22,27 @@ exports.parse = function(socket, io, clientLookup, players) {
 			msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
     		io.emit('chat', msg);	
 		}
-		//If command is "grind" Temporary skill-usage command. This command just butchers 'examine' code, and should not be used to base other skills on.
+		//This command is "grind" Temporary skill-usage command. should not be used to base other skills on.
 		else if(commandSplit[0] === 'grind') {
-			if(commandSplit[1] == null) {
-				socket.emit('log', JSON.stringify({"command":"Enter your own name to grind because im gay"}));
-			} else {
-				//Examine Player
-				//console.log('map: '+mapOut.map);
-				var foundPlayer = false;
-				for(var coordX = 0; coordX < mapOut.map.length; coordX++) {
-					var row = mapOut.map[coordX];
-					for(var coordY = 0; coordY < row.length; coordY++) {
-						var roomOut = JSON.parse(row[coordY]);
-						//console.log(roomOut.name+' players: '+roomOut.players);
-						for(var p in roomOut.players) {
-							if(commandSplit[1] === roomOut.players[p]) {
-								foundPlayer = true;
-								players.forEach(function(result, index) {
-									var playerOut = JSON.parse(result);
-									if(playerOut.namePrint.toLowerCase() === commandSplit[1]) {
-										//TODO(Gosts) Make skill check and skill increase two unrelated functions, return the needed numbers, modify player, convert back to json, replace index
-										msg = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
-										//Success Condition
-										if (msg == "")
-											msg = "Success!";
-										socket.emit('log', JSON.stringify({"command":msg}));
-									};
-								});
-							};
+			var foundPlayer = false;
+			for(var coordX = 0; coordX < mapOut.map.length; coordX++) {
+				var row = mapOut.map[coordX];
+				for(var coordY = 0; coordY < row.length; coordY++) {
+					var roomOut = JSON.parse(row[coordY]);
+					//console.log(roomOut.name+' players: '+roomOut.players);
+					for(var p in roomOut.players) {
+						if(jsonOut.name.toLowerCase() === roomOut.players[p]) {
+							foundPlayer = true;
+							players.forEach(function(result, index) {
+								var playerOut = JSON.parse(result);
+									//TODO(Gosts) Make skill check and skill increase two unrelated functions, return the needed numbers, modify player, convert back to json, replace index
+									msg = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
+									//Success Condition
+									if (msg == "") msg = "Success!";
+									//Fail Condition
+									else players[index] = JSON.stringify(playerOut);
+									socket.emit('log', JSON.stringify({"command":msg}));
+							});
 						};
 					};
 				};
@@ -231,14 +224,12 @@ exports.parse = function(socket, io, clientLookup, players) {
 								foundPlayer = true;
 								players.forEach(function(result, index) {
 									var playerOut = JSON.parse(result);
-									if(playerOut.namePrint.toLowerCase() === commandSplit[1]) {
-										msg = JSON.stringify({"command":"Name: "+playerOut.namePrint});
+									msg = JSON.stringify({"command":"Name: "+playerOut.namePrint});
+									socket.emit('log', msg);
+									for (i = 0; i < playerOut.skills.length; i++) {
+										msg = JSON.stringify({"command":playerOut.skills[i].name+": Rank "+playerOut.skills[i].rank+" (EXP: "+playerOut.skills[i].exp+"/"+playerTools.expNeeded(playerOut.skills[i].rank)+")"});
 										socket.emit('log', msg);
-										for (i = 0; i < playerOut.skills.length; i++) {
-											msg = JSON.stringify({"command":playerOut.skills[i].name+": Rank "+playerOut.skills[i].rank+" (EXP: "+playerOut.skills[i].exp+")"});
-											socket.emit('log', msg);
-										}
-									};
+									}
 								});
 							};
 						};

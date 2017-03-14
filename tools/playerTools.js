@@ -5,7 +5,7 @@ exports.skillCheck = function(player, skill, successBase, successSkillMod, exp) 
 	if (roll <= successBase) {
 		return "";
 	} else {
-		return "Failure! (" + skillIncrease(player, skill, exp) + ")"; 
+		return "Failure! (" + exports.skillIncrease(player, skill, exp) + ")"; 
 	}
 };
 	
@@ -14,8 +14,8 @@ exports.skillCheck = function(player, skill, successBase, successSkillMod, exp) 
 exports.skillIncrease = function(player, skill, exp) {
 	player.skills[skill].exp += exp;
 	ranksGained = 0;
-	while (player.skills[skill].exp >= Math.pow(player.skills[skill].rank, 1.1) * 100) {
-		player.skills[skill].exp -= Math.pow(player.skills[skill].rank, 1.1) * 100;
+	while (player.skills[skill].exp >= exports.expNeeded(player.skills[skill].rank)) {
+		player.skills[skill].exp -= exports.expNeeded(player.skills[skill].rank);
 		player.skills[skill].rank++;
 	};
 	output = "You gained " + exp + " " + player.skills[skill].name + " EXP!"
@@ -24,15 +24,8 @@ exports.skillIncrease = function(player, skill, exp) {
 	return output;
 };
 
-skillIncrease = function(player, skill, exp) {
-	player.skills[skill].exp += exp;
-	ranksGained = 0;
-	while (player.skills[skill].exp >= Math.pow(player.skills[skill].rank, 1.1) * 100) {
-		player.skills[skill].exp -= Math.pow(player.skills[skill].rank, 1.1) * 100;
-		player.skills[skill].rank++;
-	};
-	output = "You gained " + exp + " " + player.skills[skill].name + " EXP!"
-	if (ranksGained > 0)
-		output += " Your rank increased by " + ranksGained + "!";
-	return output;
-};
+//Calculates the experience required for a skill to increase in rank.
+//The rank put in should be the CURRENT rank of the skill, not the one you're trying to reach next.
+exports.expNeeded = function(rank) {
+	return Math.round(Math.pow(rank, 1.1) * 100)
+}
