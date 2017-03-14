@@ -3,5 +3,6 @@ module.exports = class Room {
 		this.namePrint = name;
 		this.name = name.toLowerCase();
 		this.players = [];
+		this.inventory = [];
 	};
 };

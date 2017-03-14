@@ -1,4 +1,5 @@
 const Player = require('../models/player');
+const Item = require('../models/item');
 const fs = require('fs');
 
 var env = 'development';
@@ -33,6 +34,9 @@ exports.newPlayer = function(socket, io, players) {
 		console.log(mapOut);
 		var spawnOut = JSON.parse(mapOut.map[0][0]);
 		spawnOut.players.indexOf(jsonOut.name.toLowerCase()) === -1 ? spawnOut.players.push(jsonOut.name.toLowerCase()) : console.log('newPlayer: Player already exists in spawn');
+		var wrench = new Item('Wrench', "It's a wrench", 3, 10, true);
+		var wrenchIn = JSON.stringify(wrench);
+		spawnOut.inventory.push(wrenchIn);
 		mapOut.map[0][0] = JSON.stringify(spawnOut);
 		console.log(mapOut);
 		fs.writeFileSync(mapFile, JSON.stringify(mapOut));

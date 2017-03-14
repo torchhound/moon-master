@@ -70,7 +70,7 @@ exports.parse = function(socket, io, clientLookup, players) {
 						var roomOut = JSON.parse(row[y]);
 						for(var y in roomOut.players) {
 							if(jsonOut.name.toLowerCase() === roomOut.players[y]) {
-         						msg = JSON.stringify({"command":"examine: "+roomOut.name});
+         						msg = JSON.stringify({"command":"examine: "+roomOut.name+"; Players: "+roomOut.players+"; Contents: "+roomOut.inventory});
          						socket.emit('log', msg);
     						};
          				};

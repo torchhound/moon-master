@@ -10,5 +10,6 @@ module.exports = class Player {
 		this.skills[1] = {name:"im gay", rank:1, exp:0}
 		this.skills[2] = {name:"fakeskill", rank:1, exp:0}
 		this.position = [0, 0];
+		this.inventory = [];
 	};	
 };
