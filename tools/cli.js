@@ -35,13 +35,13 @@ exports.parse = function(socket, io, clientLookup, players) {
 							foundPlayer = true;
 							players.forEach(function(result, index) {
 								var playerOut = JSON.parse(result);
-									//TODO(Gosts) Make skill check and skill increase two unrelated functions, return the needed numbers, modify player, convert back to json, replace index
-									msg = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
-									//Success Condition
-									if (msg == "") msg = "Success!";
-									//Fail Condition
-									else players[index] = JSON.stringify(playerOut);
-									socket.emit('log', JSON.stringify({"command":msg}));
+								//TODO(Gosts) Make skill check and skill increase two unrelated functions, return the needed numbers, modify player, convert back to json, replace index
+								msg = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
+								//Success Condition
+								if (msg == "") msg = "Success!";
+								//Fail Condition
+								else players[index] = JSON.stringify(playerOut);
+								socket.emit('log', JSON.stringify({"command":msg}));
 							});
 						};
 					};
@@ -53,8 +53,7 @@ exports.parse = function(socket, io, clientLookup, players) {
 			if(commandSplit[1] == null){
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to move to"}));
 			} else if(commandSplit[1] != null) { 
-				console.log(commandSplit[1]);
-				playerTools.move(commandSplit[1], players, jsonOut, mapOut, socket, mapFile);
+				playerTools.move(commandSplit[1], players, jsonOut, mapOut, socket, mapFile, clientLookup, io);
 			} else {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to move to"}));
 			}
@@ -98,7 +97,7 @@ exports.parse = function(socket, io, clientLookup, players) {
 									for (i = 0; i < playerOut.skills.length; i++) {
 										msg = JSON.stringify({"command":playerOut.skills[i].name+": Rank "+playerOut.skills[i].rank+" (EXP: "+playerOut.skills[i].exp+"/"+playerTools.expNeeded(playerOut.skills[i].rank)+")"});
 										socket.emit('log', msg);
-									}
+									};
 								});
 							};
 						};

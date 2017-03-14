@@ -33,7 +33,7 @@ exports.expNeeded = function(rank) {
 	return Math.round(Math.pow(rank, 1.1) * 100)
 };
 
-exports.move = function(direction, players, jsonOut, mapOut, socket, mapFile) {
+exports.move = function(direction, players, jsonOut, mapOut, socket, mapFile, clientLookup, io) {
 	var position;
 	players.forEach(function(result, index) {
 		var playerOut = JSON.parse(result);
@@ -111,6 +111,13 @@ exports.move = function(direction, players, jsonOut, mapOut, socket, mapFile) {
 	p2 = position[1];
  	var newRoomOut = JSON.parse(mapOut.map[p1][p2]);
 	if(newRoomOut.players.indexOf(jsonOut.name.toLowerCase()) === -1) {
+		for(var x in newRoomOut.players) {
+			clientLookup.forEach(function(result, index) {
+				if(result.name === newRoomOut.players[x]) {
+					io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":jsonOut.name+" moved into your room"}));
+				};
+			});
+		};
 		newRoomOut.players.push(jsonOut.name.toLowerCase());
 		mapOut.map[p1][p2] = JSON.stringify(newRoomOut);
 		fs.writeFileSync(mapFile, JSON.stringify(mapOut));
