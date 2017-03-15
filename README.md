@@ -1,24 +1,24 @@
-#moon-master
+# moon-master
 
-##Installing
+## Installing
 
 Make sure you have an up to date `config.js`
 
-###Install nodejs dependencies
+### Install nodejs dependencies
 
 `npm install`
 
 `npm install -g nodemon`
 
-##Running
+## Running
 
 `nodemon`
 
-##Testing
+## Testing
 
 `npm test`
 
-##Troubleshooting
+## Troubleshooting
 
 If examining a player returns 2 identical outputs or you notice a console.log of the map with 2 of the same player the map did not get recreated on server restart and the checks failed.
 
