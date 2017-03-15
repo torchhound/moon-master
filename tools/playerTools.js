@@ -111,6 +111,13 @@ exports.move = function(direction, players, jsonOut, mapOut, socket, mapFile, cl
 	p2 = position[1];
  	var newRoomOut = JSON.parse(mapOut.map[p1][p2]);
 	if(newRoomOut.players.indexOf(jsonOut.name.toLowerCase()) === -1) {
+		for(var x in oldRoomOut.players) {
+			clientLookup.forEach(function(result, index) {
+				if(result.name === oldRoomOut.players[x]) {
+					io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":jsonOut.name+" moved out of your room"}));
+				};
+			});
+		};
 		for(var x in newRoomOut.players) {
 			clientLookup.forEach(function(result, index) {
 				if(result.name === newRoomOut.players[x]) {
