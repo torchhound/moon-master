@@ -22,31 +22,19 @@ exports.parse = function(socket, io, clientLookup, players) {
 			msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
     		io.emit('chat', msg);	
 		}
-		//This command is "grind" Temporary skill-usage command. should not be used to base other skills on.
+		//Grind is a temporary skill but this can be used as the base for most self-only skills.
 		else if(commandSplit[0] === 'grind') {
-			var foundPlayer = false;
-			for(var coordX = 0; coordX < mapOut.map.length; coordX++) {
-				var row = mapOut.map[coordX];
-				for(var coordY = 0; coordY < row.length; coordY++) {
-					var roomOut = JSON.parse(row[coordY]);
-					//console.log(roomOut.name+' players: '+roomOut.players);
-					for(var p in roomOut.players) {
-						if(jsonOut.name.toLowerCase() === roomOut.players[p]) {
-							foundPlayer = true;
-							players.forEach(function(result, index) {
-								var playerOut = JSON.parse(result);
-								//TODO(Gosts) Make skill check and skill increase two unrelated functions, return the needed numbers, modify player, convert back to json, replace index
-								msg = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
-								//Success Condition
-								if (msg == "") msg = "Success!";
-								//Fail Condition
-								else players[index] = JSON.stringify(playerOut);
-								socket.emit('log', JSON.stringify({"command":msg}));
-							});
-						};
-					};
+			players.forEach(function(result, index) {
+				var playerOut = JSON.parse(result);
+				if (jsonOut.name.toLowerCase() === playerOut.name.toLowerCase()) {
+					msg = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
+					//Success Condition
+					if (msg == "") msg = "Success!";
+					//Fail Condition
+					else players[index] = JSON.stringify(playerOut);
+					socket.emit('log', JSON.stringify({"command":msg}));
 				};
-			};
+			});
 		}
 		//If command is "move"
 		else if(commandSplit[0] === 'move') {
@@ -60,8 +48,10 @@ exports.parse = function(socket, io, clientLookup, players) {
 		}
 		//If command is "examine"
 		else if(commandSplit[0] === 'look' || commandSplit[0] === 'l' || commandSplit[0] === 'x' || commandSplit[0] === 'ex' ||commandSplit[0] === 'examine') {
+			var foundTarget = false;
 			if(commandSplit[1] == null) {
 				socket.emit('log', JSON.stringify({"command":"You must specify what you want to look at!"}));
+				foundTarget = true;
 			} else if(commandSplit[1] === 'room'){
 				//Examine Room
 				for(var x = 0; x < mapOut.map.length; x++) {
@@ -78,39 +68,34 @@ exports.parse = function(socket, io, clientLookup, players) {
     			};			
 			} else {
 				//Examine Player
-				var position;
+				var playerPos = [-1, -1];
+				var targetPos = [-2, -2];
+				var target;
+				//Get the position of the player and the player's target
 				players.forEach(function(result, index) {
 					var playerOut = JSON.parse(result);
-					if(commandSplit[1] === playerOut.name) {
-						position = playerOut.position;
+					if(jsonOut.name.toLowerCase() === playerOut.name) {
+						playerPos = playerOut.position;
 					};
-				});
-				console.log('position: '+position);
-				var foundPlayer = false;
-				for(var coordX = 0; coordX < mapOut.map.length; coordX++) {
-					var row = mapOut.map[coordX];
-					for(var coordY = 0; coordY < row.length; coordY++) {
-						var roomOut = JSON.parse(row[coordY]);
-						for(var p in roomOut.players) {
-							if(commandSplit[1] === roomOut.players[p]) {
-								foundPlayer = true;
-								players.forEach(function(result, index) {
-									var playerOut = JSON.parse(result);
-									msg = JSON.stringify({"command":"Name: "+playerOut.namePrint});
-									socket.emit('log', msg);
-									for (i = 0; i < playerOut.skills.length; i++) {
-										msg = JSON.stringify({"command":playerOut.skills[i].name+": Rank "+playerOut.skills[i].rank+" (EXP: "+playerOut.skills[i].exp+"/"+playerTools.expNeeded(playerOut.skills[i].rank)+")"});
-										socket.emit('log', msg);
-									};
-								});
-							};
-						};
+					if (commandSplit[1] === playerOut.name) {
+						targetPos = playerOut.position;
+						target = playerOut;
 					};
-				};
-				if (foundPlayer == false) {
-					msg = JSON.stringify({"command":"There is no such thing to look at!"});
+				});					
+				//If positions are the same, output info on target
+				if (playerPos[0] == targetPos[0] && playerPos[1] == targetPos[1]) {
+					foundTarget = true;
+					msg = JSON.stringify({"command":"Name: "+target.namePrint});
 					socket.emit('log', msg);
+					for (i = 0; i < target.skills.length; i++) {
+						msg = JSON.stringify({"command":target.skills[i].name+": Rank "+target.skills[i].rank+" (EXP: "+target.skills[i].exp+"/"+playerTools.expNeeded(target.skills[i].rank)+")"});
+						socket.emit('log', msg);
+					};	
 				};
+			};
+			if (foundTarget == false) {
+				msg = JSON.stringify({"command":"There is no such thing to look at!"});
+				socket.emit('log', msg);
 			};
 		}
 		//If command is not a valid command
