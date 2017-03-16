@@ -84,8 +84,12 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 					foundTarget = true;
 					msg = JSON.stringify({"command":"Name: "+target.namePrint});
 					socket.emit('log', msg);
-					for (i = 0; i < target.skills.length; i++) {
+					for (var i = 0; i < target.skills.length; i++) {
 						msg = JSON.stringify({"command":target.skills[i].name+": Rank "+target.skills[i].rank+" (EXP: "+target.skills[i].exp+"/"+playerTools.expNeeded(target.skills[i].rank)+")"});
+						socket.emit('log', msg);
+					};	
+					for (var i = 0; i < target.limbs.length; i++) {
+						msg = JSON.stringify({"command":target.limbs[i].name+" Heath: "+target.limbs[i].health/target.limbs[i].quality*100+"\% ("+target.limbs[i].health+"/"+target.limbs[i].quality+") (Quality: "+target.limbs[i].quality/target.limbs[i].qualityStandard*100+"\%)"});
 						socket.emit('log', msg);
 					};	
 				};
