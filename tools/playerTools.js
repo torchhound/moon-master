@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 var exports = module.exports = {};
 
 //Takes in a skill, the base chance the check will succeed, the chance increase (in percentile points) per rank in the skill, and the exp awarded for trying and failing. 
@@ -33,7 +31,7 @@ exports.expNeeded = function(rank) {
 	return Math.round(Math.pow(rank, 1.1) * 100)
 };
 
-exports.move = function(direction, players, jsonOut, mapOut, socket, mapFile, clientLookup, io) {
+exports.move = function(direction, players, jsonOut, socket, clientLookup, io, map) {
 	var position;
 	players.forEach(function(result, index) {
 		var playerOut = JSON.parse(result);
@@ -42,10 +40,10 @@ exports.move = function(direction, players, jsonOut, mapOut, socket, mapFile, cl
 		};
 	});
 	console.log('start position: '+position);
-	console.log('start map: '+mapOut.map[0][0]);
+	console.log('start map: '+map.map[0][0]);
 	var p1 = position[0], 
 		p2 = position[1];
-	var oldRoomOut = JSON.parse(mapOut.map[p1][p2]);
+	var oldRoomOut = JSON.parse(map.map[p1][p2]);
 	switch(direction) {
 		case 'n':
 		case 'north':
@@ -57,7 +55,7 @@ exports.move = function(direction, players, jsonOut, mapOut, socket, mapFile, cl
 		case 's':
 		case 'south':
 			var pTest = position[0] + 1;
-			if(pTest > mapOut.map.length - 1) { 
+			if(pTest > map.map.length - 1) { 
 				socket.emit('log', JSON.stringify({"command":"Cannot go any farther south"}));
 				return false;
 			};
@@ -65,7 +63,7 @@ exports.move = function(direction, players, jsonOut, mapOut, socket, mapFile, cl
 		case 'e':
 		case 'east':
 			var pTest = position[1] + 1;
-			if(pTest  > mapOut.map.length - 1) {
+			if(pTest  > map.map.length - 1) {
 				socket.emit('log', JSON.stringify({"command":"Cannot go any farther east"}));
 				return false;
 			};
@@ -83,8 +81,7 @@ exports.move = function(direction, players, jsonOut, mapOut, socket, mapFile, cl
 	for(var y in oldRoomOut.players) {
 		if(jsonOut.name.toLowerCase() === oldRoomOut.players[y]) {
 			oldRoomOut.players.splice(y, 1);
-			mapOut.map[p1][p2] = JSON.stringify(oldRoomOut);
-			fs.writeFileSync(mapFile, JSON.stringify(mapOut));
+			map.map[p1][p2] = JSON.stringify(oldRoomOut);
 		};
 	};
 	switch(direction) {
@@ -109,7 +106,7 @@ exports.move = function(direction, players, jsonOut, mapOut, socket, mapFile, cl
 	};
 	p1 = position[0], 
 	p2 = position[1];
- 	var newRoomOut = JSON.parse(mapOut.map[p1][p2]);
+ 	var newRoomOut = JSON.parse(map.map[p1][p2]);
 	if(newRoomOut.players.indexOf(jsonOut.name.toLowerCase()) === -1) {
 		for(var x in oldRoomOut.players) {
 			clientLookup.forEach(function(result, index) {
@@ -126,8 +123,7 @@ exports.move = function(direction, players, jsonOut, mapOut, socket, mapFile, cl
 			});
 		};
 		newRoomOut.players.push(jsonOut.name.toLowerCase());
-		mapOut.map[p1][p2] = JSON.stringify(newRoomOut);
-		fs.writeFileSync(mapFile, JSON.stringify(mapOut));
+		map.map[p1][p2] = JSON.stringify(newRoomOut);
 		switch(direction) {
 			case 'n':
 			case 'north': 
@@ -182,5 +178,5 @@ exports.move = function(direction, players, jsonOut, mapOut, socket, mapFile, cl
 		};
 	});
 	console.log('end position: '+position);
-	console.log('end map: '+mapOut.map);
+	console.log('end map: '+map.map);
 };

@@ -1,4 +1,3 @@
-const fs = require('fs');
 const playerTools = require('./playerTools');
 
 var env = 'development';
@@ -7,11 +6,8 @@ var config = require('../config')[env];
 var exports = module.exports = {};
 
 //parses commands
-exports.parse = function(socket, io, clientLookup, players) {
+exports.parse = function(socket, io, clientLookup, players, map) {
 	return function(msg){
-		var mapFile = './map.json';
-		var map = fs.readFileSync(mapFile);
-		var mapOut = JSON.parse(map);
 		var jsonOut = JSON.parse(msg);
 		//commandSplit is each separate word of the command, which we will use to determine what actions the player wants to take.
 		//commandSplit is also put in lowercase for comparison with command words, which should all be lower case.
@@ -41,7 +37,7 @@ exports.parse = function(socket, io, clientLookup, players) {
 			if(commandSplit[1] == null){
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to move to"}));
 			} else if(commandSplit[1] != null) { 
-				playerTools.move(commandSplit[1], players, jsonOut, mapOut, socket, mapFile, clientLookup, io);
+				playerTools.move(commandSplit[1], players, jsonOut, socket, clientLookup, io, map);
 			} else {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to move to"}));
 			}
@@ -54,14 +50,15 @@ exports.parse = function(socket, io, clientLookup, players) {
 				foundTarget = true;
 			} else if(commandSplit[1] === 'room'){
 				//Examine Room
-				for(var x = 0; x < mapOut.map.length; x++) {
-					var row = mapOut.map[x];
+				for(var x = 0; x < map.map.length; x++) {
+					var row = map.map[x];
 					for(var y = 0; y < row.length; y++) {
 						var roomOut = JSON.parse(row[y]);
 						for(var y in roomOut.players) {
 							if(jsonOut.name.toLowerCase() === roomOut.players[y]) {
          						msg = JSON.stringify({"command":"examine: "+roomOut.name+"; Players: "+roomOut.players+"; Contents: "+roomOut.inventory});
          						socket.emit('log', msg);
+         						foundTarget = true;
     						};
          				};
          			};

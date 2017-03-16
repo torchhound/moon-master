@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const underscore = require('underscore');
+const fs = require('fs');
 const cli = require('./tools/cli');
 const users = require('./routes/users');
 const api = require('./routes/api');
@@ -14,6 +15,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 var clientLookup = [];
 var players = [];
+var mapJson;
 
 if(env == "development") {
 	app.use(morgan('dev'));
@@ -27,7 +29,10 @@ app.use(function(req, res) {
     res.render("not-found.html");
  });
 app.use(logError);
-map.create(); 
+map.create();
+var mapFile = fs.readFileSync('./map.json');
+var mapOut = JSON.parse(mapFile);
+mapJson = mapOut;
 
 //Logs errors to console
 function logError(error, req, res, next){
@@ -37,8 +42,8 @@ function logError(error, req, res, next){
 
 io.on('connection', function(socket){
 	socket.on('login', api.login(socket, io, clientLookup, players));
-	socket.on('newPlayer', api.newPlayer(socket, io, players));
-	socket.on('command', cli.parse(socket, io, clientLookup, players));
+	socket.on('newPlayer', api.newPlayer(socket, io, players, mapJson));
+	socket.on('command', cli.parse(socket, io, clientLookup, players, mapJson));
 	socket.on('disconnect', function(){
     	clientLookup.forEach(function(result, index) {
     		if(result.socketId === socket.id) {
