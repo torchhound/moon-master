@@ -33,10 +33,12 @@ exports.expNeeded = function(rank) {
 
 exports.move = function(direction, players, jsonOut, socket, clientLookup, io, map) {
 	var position;
+	var playerIndex;
 	players.forEach(function(result, index) { //TODO(torchhound) make index a var to eliminate players.forEach at the end
 		var playerOut = JSON.parse(result);
 		if(playerOut.name === jsonOut.name.toLowerCase()) {
 			position = playerOut.position;
+			playerIndex = index;
 		};
 	});
 	console.log('start position: '+position);
@@ -169,14 +171,10 @@ exports.move = function(direction, players, jsonOut, socket, clientLookup, io, m
 		default:
 			socket.emit('log', JSON.stringify({'command':'An error occured in your movement'}));
 		};
-	};				
-	players.forEach(function(result, index) {
-		var playerOut = JSON.parse(result);
-		if(playerOut.name === jsonOut.name.toLowerCase()) {
-			playerOut.position = position;
-			players[index] = JSON.stringify(playerOut);
-		};
-	});
+	};
+	var playerOut = JSON.parse(players[playerIndex]);
+	playerOut.position = position;
+	players[playerIndex] = JSON.stringify(playerOut);
 	console.log('end position: '+position);
 	console.log('end map: '+map.map);
 };
