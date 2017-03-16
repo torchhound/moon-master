@@ -33,7 +33,7 @@ exports.expNeeded = function(rank) {
 
 exports.move = function(direction, players, jsonOut, socket, clientLookup, io, map) {
 	var position;
-	players.forEach(function(result, index) {
+	players.forEach(function(result, index) { //TODO(torchhound) make index a var to eliminate players.forEach at the end
 		var playerOut = JSON.parse(result);
 		if(playerOut.name === jsonOut.name.toLowerCase()) {
 			position = playerOut.position;
@@ -179,4 +179,71 @@ exports.move = function(direction, players, jsonOut, socket, clientLookup, io, m
 	});
 	console.log('end position: '+position);
 	console.log('end map: '+map.map);
+};
+
+exports.drop = function(item, jsonOut, socket, players, map, clientLookup) {
+	var inventory;
+	var position;
+	var droppedItem;
+	var playerIndex;
+	players.forEach(function(result, index) { 
+		var playerOut = JSON.parse(result);
+		if(playerOut.name === jsonOut.name.toLowerCase()) {
+			console.log('drop before player inventory: '+ playerOut.inventory);
+			inventory = playerOut.inventory;
+			position = playerOut.position;
+			playerIndex = index;
+		};
+	});
+	inventory.forEach(function(result, index) {
+		var inventoryOut = JSON.parse(result);
+		if(inventoryOut.name === item){
+			droppedItem = inventoryOut;
+			inventory.splice(index, 1);
+			socket.emit('log', JSON.stringify({"command":"You dropped "+item}));
+		};
+	});
+	var p1 = position[0], 
+		p2 = position[1];
+	var roomOut = JSON.parse(map.map[p1][p2]);
+	roomOut.inventory.push(JSON.stringify(droppedItem));
+	map.map[p1][p2] = JSON.stringify(roomOut);
+	var playerOut = JSON.parse(players[playerIndex]);
+	playerOut.inventory = inventory;
+	players[playerIndex] = JSON.stringify(playerOut);
+	console.log('drop after player inventory: '+ playerOut.inventory); 
+};
+
+exports.pickup = function(item, jsonOut, socket, players, map, clientLookup) {
+	var inventory;
+	var position;
+	var pickupItem;
+	var playerIndex;
+	players.forEach(function(result, index) { 
+		var playerOut = JSON.parse(result);
+		if(playerOut.name === jsonOut.name.toLowerCase()) {
+			console.log('pickup before player inventory: '+ playerOut.inventory);
+			inventory = playerOut.inventory;
+			position = playerOut.position;
+			playerIndex = index;
+		};
+	});
+	var p1 = position[0], 
+		p2 = position[1];
+	var roomOut = JSON.parse(map.map[p1][p2]);
+	roomOut.inventory.forEach(function(result, index) {
+		var inventoryOut = JSON.parse(result);
+		if(inventoryOut.name === item){
+			pickupItem = inventoryOut;
+			roomOut.inventory.splice(index, 1);
+			socket.emit('log', JSON.stringify({"command":"You picked up "+item}));
+		};
+	});
+	map.map[p1][p2] = JSON.stringify(roomOut);
+	inventory.push(JSON.stringify(pickupItem));
+	console.log(inventory);
+	var playerOut = JSON.parse(players[playerIndex]);
+	playerOut.inventory = inventory;
+	players[playerIndex] = JSON.stringify(playerOut);
+	console.log('pickup after player inventory: '+ playerOut.inventory); 
 };
