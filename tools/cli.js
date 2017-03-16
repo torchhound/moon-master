@@ -32,6 +32,24 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 				};
 			});
 		}
+		else if(commandSplit[0] === 'pickup') {
+			if(commandSplit[1] == null){
+				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
+			} else if(commandSplit[1] != null) {
+				playerTools.pickup(commandSplit[1], jsonOut, socket, players, map, clientLookup);
+			} else {
+				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
+			};
+		}
+		else if(commandSplit[0] === 'drop') {
+			if(commandSplit[1] == null){
+				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
+			} else if(commandSplit[1] != null) { 
+				playerTools.drop(commandSplit[1], jsonOut, socket, players, map, clientLookup);
+			} else {
+				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
+			};
+		}
 		//If command is "move"
 		else if(commandSplit[0] === 'move') {
 			if(commandSplit[1] == null){
@@ -40,7 +58,7 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 				playerTools.move(commandSplit[1], players, jsonOut, socket, clientLookup, io, map);
 			} else {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to move to"}));
-			}
+			};
 		}
 		//If command is "examine"
 		else if(commandSplit[0] === 'look' || commandSplit[0] === 'l' || commandSplit[0] === 'x' || commandSplit[0] === 'ex' ||commandSplit[0] === 'examine') {
@@ -82,7 +100,7 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 				//If positions are the same, output info on target
 				if (playerPos[0] == targetPos[0] && playerPos[1] == targetPos[1]) {
 					foundTarget = true;
-					msg = JSON.stringify({"command":"Name: "+target.namePrint});
+					msg = JSON.stringify({"command":"Name: "+target.namePrint+" Inventory: "+target.inventory});
 					socket.emit('log', msg);
 					for (i = 0; i < target.skills.length; i++) {
 						msg = JSON.stringify({"command":target.skills[i].name+": Rank "+target.skills[i].rank+" (EXP: "+target.skills[i].exp+"/"+playerTools.expNeeded(target.skills[i].rank)+")"});
