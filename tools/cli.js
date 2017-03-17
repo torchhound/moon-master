@@ -83,14 +83,16 @@ exports.parse = function(socket, io, clientLookup, players, map) {
     			};			
 			} else {
 				//Examine Player
-				var playerPos = [-1, -1];
+				var playerPos = [-1, -1]; //WATCH
 				var targetPos = [-2, -2];
 				var target;
+				var playerIndex;
 				//Get the position of the player and the player's target
 				players.forEach(function(result, index) {
 					var playerOut = JSON.parse(result);
 					if(jsonOut.name.toLowerCase() === playerOut.name) {
 						playerPos = playerOut.position;
+						playerIndex = index;
 					};
 					if (commandSplit[1] === playerOut.name) {
 						targetPos = playerOut.position;
@@ -110,6 +112,44 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 						msg = JSON.stringify({"command":target.limbs[i].name+" Heath: "+target.limbs[i].health/target.limbs[i].quality*100+"\% ("+target.limbs[i].health+"/"+target.limbs[i].quality+") (Quality: "+target.limbs[i].quality/target.limbs[i].qualityStandard*100+"\%)"});
 						socket.emit('log', msg);
 					};	
+				};
+				if (foundTarget == false) {
+					var p1 = playerPos[0],
+						p2 = playerPos[1];
+					var roomOut = JSON.parse(map.map[p1][p2]);
+					var playerOut = JSON.parse(players[playerIndex]);
+					playerOut.inventory.forEach(function(result, index) { //Examine item in your own inventory
+						var inventoryOut = JSON.parse(result);
+						if(inventoryOut.name === commandSplit[1]) {
+							console.log(inventoryOut);
+							socket.emit('log', JSON.stringify({"command":inventoryOut.name})); //TODO(torchhound) add more item attributes
+							foundTarget = true;
+						};
+					});
+					/*for(var y in roomOut.players) { //Examine item in any player's inventory in the current room, useful later for examining equipped items only
+						players.forEach(function(result, index) { 
+							var playerOut = JSON.parse(result);
+							if(y === playerOut.name) {
+								for(var x in playerOut.inventory){
+									var inventoryOut = JSON.parse(playerOut.inventory[x]);
+									if(inventoryOut.name === commandSplit[1]) {
+										socket.emit('log', JSON.stringify({"command":inventoryOut}));
+										foundTarget = true;
+									};
+								};
+							};
+						});
+					};*/
+					if(foundTarget == false) { //Examine item in the room's inventory
+						roomOut.inventory.forEach(function(result, index) {
+							var inventoryOut = JSON.parse(result);
+							if(inventoryOut.name === commandSplit[1]){
+								console.log(inventoryOut);
+								socket.emit('log', JSON.stringify({"command":inventoryOut.name})); //TODO(torchhound) add more item attributes
+								foundTarget = true;
+							};
+						});
+					};
 				};
 			};
 			if (foundTarget == false) {
