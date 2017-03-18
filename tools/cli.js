@@ -1,4 +1,5 @@
 const playerTools = require('./playerTools');
+const itemTools = require('./itemTools');
 
 var env = 'development';
 var config = require('../config')[env];
@@ -36,7 +37,7 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 			if(commandSplit[1] == null){
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
 			} else if(commandSplit[1] != null) {
-				playerTools.pickup(commandSplit[1], jsonOut, socket, players, map, clientLookup);
+				itemTools.pickup(commandSplit[1], jsonOut, socket, players, map, clientLookup);
 			} else {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
 			};
@@ -45,7 +46,7 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 			if(commandSplit[1] == null){
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
 			} else if(commandSplit[1] != null) { 
-				playerTools.drop(commandSplit[1], jsonOut, socket, players, map, clientLookup);
+				itemTools.drop(commandSplit[1], jsonOut, socket, players, map, clientLookup);
 			} else {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
 			};
@@ -54,7 +55,7 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 			if(commandSplit[1] == null){
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to equip"}));
 			} else if(commandSplit[1] != null) { 
-				playerTools.equip(commandSplit[1], jsonOut, socket, players, map, clientLookup);
+				itemTools.equip(commandSplit[1], jsonOut, socket, players, map, clientLookup);
 			} else {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to equip"}));
 			};
@@ -63,7 +64,7 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 			if(commandSplit[1] == null){
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to unequip"}));
 			} else if(commandSplit[1] != null) { 
-				playerTools.unequip(commandSplit[1], jsonOut, socket, players, map, clientLookup);
+				itemTools.unequip(commandSplit[1], jsonOut, socket, players, map, clientLookup);
 			} else {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to unequip"}));
 			};
