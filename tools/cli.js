@@ -145,12 +145,11 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 						};
 					});
 					for(var y in roomOut.players) { //Examine item in any player's equipment in the current room
-						players.forEach(function(result, index) { //TODO(torchhound) doesn't work
+						players.forEach(function(result, index) { 
 							var playerOut = JSON.parse(result);
-							if(y === playerOut.name) {
+							if(roomOut.players[y] === playerOut.name) {
 								for(var x in playerOut.equipment){
 									var equipmentOut = JSON.parse(playerOut.equipment[x]);
-									console.log('examine equipment equipmentOut '+equipmentOut);
 									if(equipmentOut.name === commandSplit[1]) {
 										socket.emit('log', JSON.stringify({"command":equipmentOut.name}));
 										foundTarget = true;
