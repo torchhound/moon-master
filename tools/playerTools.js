@@ -34,7 +34,7 @@ exports.expNeeded = function(rank) {
 exports.move = function(direction, players, jsonOut, socket, clientLookup, io, map) {
 	var position;
 	var playerIndex;
-	players.forEach(function(result, index) { //TODO(torchhound) make index a var to eliminate players.forEach at the end
+	players.forEach(function(result, index) {
 		var playerOut = JSON.parse(result);
 		if(playerOut.name === jsonOut.name.toLowerCase()) {
 			position = playerOut.position;
@@ -270,11 +270,10 @@ exports.equip = function(item, jsonOut, socket, players, map, clientLookup) {
 	var position;
 	var equipItem;
 	var playerIndex;
-	var foundItem;
+	var foundItem = false;
 	players.forEach(function(result, index) { 
 		var playerOut = JSON.parse(result);
 		if(playerOut.name === jsonOut.name.toLowerCase()) {
-			console.log('equip before player inventory: '+ playerOut.inventory);
 			inventory = playerOut.inventory;
 			equipment = playerOut.equipment;
 			position = playerOut.position;
@@ -285,16 +284,16 @@ exports.equip = function(item, jsonOut, socket, players, map, clientLookup) {
 		p2 = position[1];
 	var roomOut = JSON.parse(map.map[p1][p2]);
 	inventory.forEach(function(result, index) {
-			var inventoryOut = JSON.parse(result);
-			if(inventoryOut.name === item){
-				equipItem = inventoryOut;
-				inventory.splice(index, 1);
-				socket.emit('log', JSON.stringify({"command":"You equipped "+item+" from your inventory"}));
-				foundItem = true;
-			};
-		});
+		var inventoryOut = JSON.parse(result);
+		if(inventoryOut.name === item){
+			equipItem = inventoryOut;
+			inventory.splice(index, 1);
+			socket.emit('log', JSON.stringify({"command":"You equipped "+item+" from your inventory"}));
+			foundItem = true;
+		};
+	});
 	if(foundItem == false) {
-		roomOut.inventory.forEach(function(result, index) { //TODO(torchhound) Not working
+		roomOut.inventory.forEach(function(result, index) { 
 			var inventoryOut = JSON.parse(result);
 			if(inventoryOut.name === item) {
 				equipItem = inventoryOut;
@@ -306,12 +305,10 @@ exports.equip = function(item, jsonOut, socket, players, map, clientLookup) {
 		});
 	};
 	equipment.push(JSON.stringify(equipItem));
-	//console.log(inventory);
 	var playerOut = JSON.parse(players[playerIndex]);
 	playerOut.inventory = inventory;
 	playerOut.equipment = equipment;
 	players[playerIndex] = JSON.stringify(playerOut);
-	//console.log('pickup after player inventory: '+ playerOut.inventory);
 };
 
 exports.unequip = function(item, jsonOut, socket, players, map, clientLookup) {
@@ -338,7 +335,6 @@ exports.unequip = function(item, jsonOut, socket, players, map, clientLookup) {
 	});
 	inventory.push(JSON.stringify(unequipItem));
 	socket.emit('log', JSON.stringify({"command":"You unequipped "+item}));
-	//console.log(inventory);
 	var playerOut = JSON.parse(players[playerIndex]);
 	playerOut.inventory = inventory;
 	playerOut.equipment = equipment;
