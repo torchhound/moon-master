@@ -34,5 +34,6 @@ module.exports = class Player {
 		};
 		this.position = [0, 0];
 		this.inventory = [];
+		this.equipment = [];
 	};	
 };

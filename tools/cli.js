@@ -50,6 +50,24 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
 			};
 		}
+		else if(commandSplit[0] === 'equip') {
+			if(commandSplit[1] == null){
+				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to equip"}));
+			} else if(commandSplit[1] != null) { 
+				playerTools.equip(commandSplit[1], jsonOut, socket, players, map, clientLookup);
+			} else {
+				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to equip"}));
+			};
+		}
+		else if(commandSplit[0] === 'unequip') {
+			if(commandSplit[1] == null){
+				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to unequip"}));
+			} else if(commandSplit[1] != null) { 
+				playerTools.unequip(commandSplit[1], jsonOut, socket, players, map, clientLookup);
+			} else {
+				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to unequip"}));
+			};
+		}
 		//If command is "move"
 		else if(commandSplit[0] === 'move') {
 			if(commandSplit[1] == null){
@@ -102,7 +120,7 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 				//If positions are the same, output info on target
 				if (playerPos[0] == targetPos[0] && playerPos[1] == targetPos[1]) {
 					foundTarget = true;
-					msg = JSON.stringify({"command":"Name: "+target.namePrint+" Inventory: "+target.inventory});
+					msg = JSON.stringify({"command":"Name: "+target.namePrint+" Equipment: "+target.equipment});
 					socket.emit('log', msg);
 					for (var i = 0; i < target.skills.length; i++) {
 						msg = JSON.stringify({"command":target.skills[i].name+": Rank "+target.skills[i].rank+" (EXP: "+target.skills[i].exp+"/"+playerTools.expNeeded(target.skills[i].rank)+")"});
@@ -126,20 +144,21 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 							foundTarget = true;
 						};
 					});
-					/*for(var y in roomOut.players) { //Examine item in any player's inventory in the current room, useful later for examining equipped items only
-						players.forEach(function(result, index) { 
+					for(var y in roomOut.players) { //Examine item in any player's equipment in the current room
+						players.forEach(function(result, index) { //TODO(torchhound) doesn't work
 							var playerOut = JSON.parse(result);
 							if(y === playerOut.name) {
-								for(var x in playerOut.inventory){
-									var inventoryOut = JSON.parse(playerOut.inventory[x]);
-									if(inventoryOut.name === commandSplit[1]) {
-										socket.emit('log', JSON.stringify({"command":inventoryOut}));
+								for(var x in playerOut.equipment){
+									var equipmentOut = JSON.parse(playerOut.equipment[x]);
+									console.log('examine equipment equipmentOut '+equipmentOut);
+									if(equipmentOut.name === commandSplit[1]) {
+										socket.emit('log', JSON.stringify({"command":equipmentOut.name}));
 										foundTarget = true;
 									};
 								};
 							};
 						});
-					};*/
+					};
 					if(foundTarget == false) { //Examine item in the room's inventory
 						roomOut.inventory.forEach(function(result, index) {
 							var inventoryOut = JSON.parse(result);
