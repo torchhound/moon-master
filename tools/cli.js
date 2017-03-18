@@ -123,15 +123,21 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 					foundTarget = true;
 					msg = JSON.stringify({"command":"Name: "+target.namePrint+" Equipment: "+target.equipment});
 					socket.emit('log', msg);
+					//Print Skills
 					for (var i = 0; i < target.skills.length; i++) {
 						msg = JSON.stringify({"command":target.skills[i].name+": Rank "+target.skills[i].rank+" (EXP: "+target.skills[i].exp+"/"+playerTools.expNeeded(target.skills[i].rank)+")"});
 						socket.emit('log', msg);
 					};	
+					//Print total health
+					msg = JSON.stringify({"command":"General Heath: "+playerTools.healthTotal(target)/playerTools.healthTotalMax(target)*100+"\% ("+playerTools.healthTotal(target)+"/"+playerTools.healthTotalMax(target)+")"});
+						socket.emit('log', msg);
+					//Print limb health (temporary, should be moved to a sub-look command, although should still display limbs if they are injured)
 					for (var i = 0; i < target.limbs.length; i++) {
 						msg = JSON.stringify({"command":target.limbs[i].name+" Heath: "+target.limbs[i].health/target.limbs[i].quality*100+"\% ("+target.limbs[i].health+"/"+target.limbs[i].quality+") (Quality: "+target.limbs[i].quality/target.limbs[i].qualityStandard*100+"\%)"});
 						socket.emit('log', msg);
 					};	
 				};
+				//Examine Item
 				if (foundTarget == false) {
 					var p1 = playerPos[0],
 						p2 = playerPos[1];

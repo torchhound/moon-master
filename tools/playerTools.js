@@ -1,5 +1,12 @@
 var exports = module.exports = {};
 
+//This very very very important fraction determines what fraction of the player's overall health (the health of all of their limbs, together, with weight,) is needed to stay alive. 
+//Example: At 2, players must have more than 1/2 (50%) of the standard maximum health of a player's limbs.
+//If it were 4, players would only need 1/4 (25%) of the standard maximum health to live.
+//The word 'standard' here means, if the player's maximum health is increased, due to having SUPER ROBOT LIMBS or other reasons, that doesn't raise the 'lethal damage level' of the player.
+//In other words, the 'lethal damage level' is based on the max health for a NORMAL human, no matter what kind of person you are. 
+const HEALTH_TO_LIVE = 2;
+
 //Takes in a skill, the base chance the check will succeed, the chance increase (in percentile points) per rank in the skill, and the exp awarded for trying and failing. 
 //returns "" on a success, or information about the failure if you failed.
 exports.skillCheck = function(player, skill, successBase, successSkillMod, exp) {
@@ -29,6 +36,30 @@ exports.skillIncrease = function(player, skill, exp) {
 //The rank put in should be the CURRENT rank of the skill, not the one you're trying to reach next.
 exports.expNeeded = function(rank) {
 	return Math.round(Math.pow(rank, 1.1) * 100)
+};
+
+//Calculate the total CURRENT health of all of the player's limbs, including weighted value.
+exports.healthTotal = function(player) {
+	var tmp = 0;
+	for (var i = 0; i < player.limbs.length; i++) {
+		tmp += player.limbs[i].health * player.limbs[i].weight;
+		tmp -= player.limbs[i].qualityStandard * player.limbs[i].weight / HEALTH_TO_LIVE;
+	};
+	tmp = Math.floor(tmp);
+	if (tmp < 0) tmp = 0;
+	return tmp;
+};
+
+//Calculate the total MAXIMUM health of all of the player's limbs, including weighted value.
+exports.healthTotalMax = function(player) {
+	var tmp = 0;
+	for (var i = 0; i < player.limbs.length; i++) {
+		tmp += player.limbs[i].quality * player.limbs[i].weight;
+		tmp -= player.limbs[i].qualityStandard * player.limbs[i].weight / HEALTH_TO_LIVE;
+	};
+	tmp = Math.floor(tmp);
+	if (tmp < 0) tmp = 0;
+	return tmp;
 };
 
 exports.move = function(direction, players, jsonOut, socket, clientLookup, io, map) {
