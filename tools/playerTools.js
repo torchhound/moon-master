@@ -38,6 +38,14 @@ exports.expNeeded = function(rank) {
 	return Math.round(Math.pow(rank, 1.1) * 100)
 };
 
+//Pick out a limb from the player, based on text input the player gives.
+exports.getLimbFromInput = function(player, input) {
+	for (var i = 0; i < player.limbs.length; i++) {
+		if (player.limbs[i].name.toLowerCase() == input[2]) return i;
+	};
+	return -1;
+};
+
 //Calculate the total CURRENT health of all of the player's limbs, including weighted value.
 exports.healthTotal = function(player) {
 	var tmp = 0;

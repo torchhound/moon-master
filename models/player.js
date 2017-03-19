@@ -15,7 +15,7 @@ module.exports = class Player {
 		//qualityStandard is the 'normal' quality for a limb of this type.
 		//quality is the quality, or, the max health, of a limb of this type. If you have 0 quality, you have no limb.
 		//Health is the health of the limb. Cannot exceed quality. Generally if health reaches zero, the limb is destroyed and removed from the body. (by setting quality to 0)
-		//Type shows what the limb is made from. organic (0), mechanical (1), biomechanical (2), or anything else added later. (Alien? Psionic? demonic? who knows, video games!)
+		//Type shows what the limb is made from. Organic, Mechanical, Biomechanical, or anything else added later. (Alien? Psionic? demonic? who knows, video games!)
 		this.limbs = [];
 		this.limbs[0] = {name:"Torso", weight:3, qualityStandard:"100"};
 		this.limbs[1] = {name:"Heart", weight:10, qualityStandard:"10"};
@@ -35,7 +35,7 @@ module.exports = class Player {
 		for (var i = 0; i < this.limbs.length; i++) {
 			this.limbs[i].quality = this.limbs[i].qualityStandard;
 			this.limbs[i].health = this.limbs[i].qualityStandard;
-			this.limbs[i].type = 0;
+			this.limbs[i].type = "Biological";
 		};
 		this.position = [0, 0];
 		this.inventory = [];
