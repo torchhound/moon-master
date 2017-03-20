@@ -33,7 +33,7 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 				};
 			});
 		}
-		else if(commandSplit[0] === 'pickup') {
+		else if(commandSplit[0] === 'pickup'  || commandSplit[0] === 'g' || commandSplit[0] === 'take' || commandSplit[0] === 'get' || commandSplit[0] === 'grab' || commandSplit[0] === 'pick') {
 			if(commandSplit[1] == null){
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
 			} else if(commandSplit[1] != null) {
@@ -42,7 +42,7 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
 			};
 		}
-		else if(commandSplit[0] === 'drop') {
+		else if(commandSplit[0] === 'drop' || commandSplit[0] === 'd') {
 			if(commandSplit[1] == null){
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
 			} else if(commandSplit[1] != null) { 
@@ -51,7 +51,7 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
 			};
 		}
-		else if(commandSplit[0] === 'equip') {
+		else if(commandSplit[0] === 'equip' || commandSplit[0] === 'q') {
 			if(commandSplit[1] == null){
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to equip"}));
 			} else if(commandSplit[1] != null) { 
@@ -60,7 +60,7 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to equip"}));
 			};
 		}
-		else if(commandSplit[0] === 'unequip') {
+		else if(commandSplit[0] === 'unequip' || commandSplit[0] === 'u') {
 			if(commandSplit[1] == null){
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to unequip"}));
 			} else if(commandSplit[1] != null) { 
@@ -70,7 +70,7 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 			};
 		}
 		//If command is "move"
-		else if(commandSplit[0] === 'move') {
+		else if(commandSplit[0] === 'move' || commandSplit[0] === 'go') {
 			if(commandSplit[1] == null){
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to move to"}));
 			} else if(commandSplit[1] != null) { 

@@ -40,6 +40,41 @@ exports.expNeeded = function(rank) {
 
 //Pick out a limb from the player, based on text input the player gives.
 exports.getLimbFromInput = function(player, input) {
+	if (input[2] == "body" || input[2] == "chest") input[2] = "torso"
+	else if (input[2] == "lung") input[2] = "lungs"
+	else if (input[2] == "skull" || input[2] == "face") input[2] = "head"
+	else if (input[2] == "arml" || input[2] == "armleft") input[2] = "arm(l)"
+	else if (input[2] == "armr" || input[2] == "armright") input[2] = "arm(r)"
+	else if (input[2] == "legl" || input[2] == "legleft") input[2] = "leg(l)"
+	else if (input[2] == "legr" || input[2] == "legright") input[2] = "leg(r)"
+	else if (input[2] == "eye" || input[2] == "eyeleft") input[2] = "eye(l)"
+	else if (input[2] == "eyer" || input[2] == "eyeright") input[2] = "eye(r)"
+	else if (input[2] == "earl" || input[2] == "earleft") input[2] = "ear(l)"
+	else if (input[2] == "earr" || input[2] == "earright") input[2] = "ear(r)"
+	else if (input[2] == "left" || input[2] == "l") {
+		if (input[3] == "arm") input[2] = "arm(l)"
+		else if (input[3] == "leg") input[2] = "leg(l)"
+		else if (input[3] == "eye") input[2] = "eye(l)"
+		else if (input[3] == "ear") input[2] = "ear(l)";
+	}
+	else if (input[2] == "right" || input[2] == "r") {
+		if (input[3] == "arm") input[2] = "arm(r)"
+		else if (input[3] == "leg") input[2] = "leg(r)"
+		else if (input[3] == "eye") input[2] = "eye(r)"
+		else if (input[3] == "ear") input[2] = "ear(r)";
+	}
+	else if (input[3] == "left" || input[3] == "l") {
+		if (input[2] == "arm") input[2] = "arm(l)"
+		else if (input[2] == "leg") input[2] = "leg(l)"
+		else if (input[2] == "eye") input[2] = "eye(l)"
+		else if (input[2] == "ear") input[2] = "ear(l)";
+	}
+	else if (input[3] == "right" || input[3] == "r") {
+		if (input[2] == "arm") input[2] = "arm(r)"
+		else if (input[2] == "leg") input[2] = "leg(r)"
+		else if (input[2] == "eye") input[2] = "eye(r)"
+		else if (input[2] == "ear") input[2] = "ear(r)";
+	};
 	for (var i = 0; i < player.limbs.length; i++) {
 		if (player.limbs[i].name.toLowerCase() == input[2]) return i;
 	};
