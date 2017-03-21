@@ -121,8 +121,8 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 					var row = map.map[x];
 					for(var y = 0; y < row.length; y++) {
 						var roomOut = JSON.parse(row[y]);
-						for(var y in roomOut.players) {
-							if(jsonOut.name.toLowerCase() === roomOut.players[y]) {
+						for(var p in roomOut.players) {
+							if(jsonOut.name.toLowerCase() === roomOut.players[p]) {
          						msg = JSON.stringify({"command":"examine: "+roomOut.name+"; Players: "+roomOut.players+"; Contents: "+roomOut.inventory});
          						socket.emit('log', msg);
          						foundTarget = true;
