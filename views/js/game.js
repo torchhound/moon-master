@@ -18,12 +18,14 @@ $("#submit").click(function(){
 socket.on('log', function(msg){
 	var jsonOut = JSON.parse(msg);
 	var command = jsonOut.command;
-    $('#log').append($('<li>').text(command + '\n'));
+  $('#log').append($('<li>').text(command + '\n'));
+  document.getElementById('log').scrollIntoView(false);
  });
 
 socket.on('chat', function(msg){
 	var jsonOut = JSON.parse(msg);
 	var name = jsonOut.namePrint;
 	var command = jsonOut.command;
-    $('#chat').append($('<li>').text(name + ': ' + command + '\n'));
+  $('#chat').append($('<li>').text(name + ': ' + command + '\n'));
+  document.getElementById('chat').scrollIntoView(false);
  });
