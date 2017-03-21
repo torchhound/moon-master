@@ -1,12 +1,10 @@
 {
   "name": "moon-master",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A Moon MUD",
   "main": "index.js",
   "scripts": {
     "test": "node tests/endpointTests.js",
-    "clean-db": "node tools/cleanDb.js",
-    "init-db": "node tools/initDb.js",
     "create-map": "node tools/createMap.js"
   },
   "repository": {

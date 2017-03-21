@@ -33,6 +33,13 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 				};
 			});
 		}
+		else if(commandSplit[0] === 'combat') {
+			if(commandSplit[1] == null){
+				socket.emit('combat', JSON.stringify({"queue":"No queued action", "log":"Intentionally left blank"}));
+			} else {
+				socket.emit('combat', JSON.stringify({"queue":commandSplit[1], "log":"Intentionally left blank"}));
+			};
+		}
 		else if(commandSplit[0] === 'pickup'  || commandSplit[0] === 'g' || commandSplit[0] === 'take' || commandSplit[0] === 'get' || commandSplit[0] === 'grab' || commandSplit[0] === 'pick') {
 			if(commandSplit[1] == null){
 				socket.emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
