@@ -14,6 +14,29 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 		//commandSplit is also put in lowercase for comparison with command words, which should all be lower case.
 		//Note that jsonOut.command has not been modified as we wish to preserve the exact spacing of the original message.
 		var commandSplit = jsonOut.command.toLowerCase().split(' ');
+		
+		//This section is the magic commandSplit fixer that fixes the stupid things dumb players try to enter as commands
+		//It does this by moving commandSplit over by one if people use dumb words that they shouldn't use in adventure games
+		//For example, 'look at', 'pick up', or putting 'the' after anything
+		if (commandSplit[1] == "at" || (commandSplit[0] == "pick" && commandSplit[1] == "up")) {
+			for (var i = 1; i < commandSplit.length - 1; i++) {
+				commandSplit[i] = commandSplit[i+1];
+			};
+		};
+		if (commandSplit[1] == "the") {
+			for (var i = 1; i < commandSplit.length - 1; i++) {
+				commandSplit[i] = commandSplit[i+1];
+			};
+		};
+		if (commandSplit[0] == "n" || commandSplit[0] == "s" || commandSplit[0] == "e" || commandSplit[0] == "w" || commandSplit[0] == "north" || commandSplit[0] == "south" || commandSplit[0] == "east" || commandSplit[0] == "west") {
+			commandSplit[commandSplit.length] = "";
+			for (var i = commandSplit.length-1; i > 0; i--) {
+				commandSplit[i] = commandSplit[i-1];
+			};
+			commandSplit[0] = "go";
+		};
+		
+		
 		//If command is 't' or 'say' then 'Local Chat'
 		if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
 			msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
