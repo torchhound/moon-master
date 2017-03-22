@@ -9,7 +9,7 @@ var exports = module.exports = {};
 exports.login = function(socket, io, clientLookup, players) { 
 	return function(msg) {
 		var jsonOut = JSON.parse(msg);
-		var potentialAdd = {name:jsonOut.name.toLowerCase(), socketId:socket.id};
+		var potentialAdd = {name:jsonOut.name.toLowerCase(), socketId:socket.id, queue:[]};
 		clientLookup.indexOf(potentialAdd) === -1 ? clientLookup.push(potentialAdd) : console.log('login: Client already exists in array');
 		var player = new Player(jsonOut.name);
 		var playerIn = JSON.stringify(player);

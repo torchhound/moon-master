@@ -38,4 +38,11 @@ socket.on('combat', function(msg) {
   $('#log').append($('<li>').text(log + '\n'));
   document.getElementById('queue').scrollIntoView(false);
   document.getElementById("cli-form").style.backgroundColor = "#ff0000";
-})
+});
+
+socket.on('queue', function(msg) {
+  var jsonOut = JSON.parse(msg);
+  var queue = jsonOut.namePrint;
+  $('#queue').append($('<li>').text(queue + '\n')); //TODO(torchhound) need to display this item by item instead of all in a block
+  document.getElementById('queue').scrollIntoView(false);
+ });
