@@ -36,9 +36,34 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 			commandSplit[0] = "go";
 		};
 		
-		
+		//GM commands; to disable cheating, simply set 'true' to 'false'
+		if (commandSplit[0] == "gm" && true) {
+			//To use modhp, type "gm hp [playername] [hpvalue] [limb]"
+			//the hpvalue can be positive or negative. It will add or subtract that much HP, but stay within the maximum and minimum.
+			//[limb] can also be 'all', in which case all limbs will be modified.
+			if (commandSplit[1] == "hp") {
+				players.forEach(function(result, index) {
+				var target = JSON.parse(result);
+					if (commandSplit[2] == target.name.toLowerCase()) {
+						if (commandSplit[4] == "all") {
+							for (var i = 0; i < target.limbs.length; i++) {
+								playerTools.setLimbHealth(target, i, commandSplit[3]);
+							};
+						}
+						else {
+							var limbInput = []
+							limbInput[0] = commandSplit[4];
+							limbInput[1] = commandSplit[5];
+							var limbNumber = playerTools.getLimbFromInput(target, limbInput);
+							playerTools.setLimbHealth(target, limbNumber, commandSplit[3]);
+						};
+						players[index] = JSON.stringify(target);
+					};
+				});
+			};
+		}
 		//If command is 't' or 'say' then 'Local Chat'
-		if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
+		else if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
 			msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
     		io.emit('chat', msg);	
 		}
@@ -152,34 +177,47 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 				if (playerPos[0] == targetPos[0] && playerPos[1] == targetPos[1]) {
 					foundTarget = true;
 					//Check if the player is asking about a specific limb.
-					var limbNumber = playerTools.getLimbFromInput(target, commandSplit);
+					var limbInput = []
+					limbInput[0] = commandSplit[2];
+					limbInput[1] = commandSplit[3];
+					var limbNumber = playerTools.getLimbFromInput(target, limbInput);
 					msg = JSON.stringify({"command":"Name: "+target.namePrint});
 					socket.emit('log', msg);
 					//Check if the player is asking about the health of the target.
-					if (commandSplit[2] == "limbs" || commandSplit[2] == "limbs" || commandSplit[2] == "health" || commandSplit[2] == "hp") {
+					if (commandSplit[2] == "limb" || commandSplit[2] == "limbs" || commandSplit[2] == "health" || commandSplit[2] == "hp") {
 						//Print total health, then limb health.
-						msg = JSON.stringify({"command":"General Health: "+playerTools.healthTotal(target)/playerTools.healthTotalMax(target)*100+"\% ("+playerTools.healthTotal(target)+"/"+playerTools.healthTotalMax(target)+")"});
+						msg = JSON.stringify({"command":"General Health: "+(playerTools.healthTotal(target)/playerTools.healthTotalMax(target)*100).toFixed()+"\% ("+playerTools.healthTotal(target)+"/"+playerTools.healthTotalMax(target)+")"});
 						socket.emit('log', msg);
 						for (var i = 0; i < target.limbs.length; i++) {
-							msg = JSON.stringify({"command":target.limbs[i].type+" "+target.limbs[i].name+" (Health: "+target.limbs[i].health/target.limbs[i].quality*100+"\%) ("+target.limbs[i].health+"/"+target.limbs[i].quality+") (Quality: "+target.limbs[i].quality/target.limbs[i].qualityStandard*100+"\%)"});
+							msg = JSON.stringify({"command":playerTools.printLimbStatus(target, i)});
 							socket.emit('log', msg);
 						};
 					}
 					else if (limbNumber != -1) {
 						//Player wants to know about a specific limb
-						msg = JSON.stringify({"command":target.limbs[limbNumber].type+" "+target.limbs[limbNumber].name+" (Health: "+target.limbs[limbNumber].health/target.limbs[limbNumber].quality*100+"\%) ("+target.limbs[limbNumber].health+"/"+target.limbs[limbNumber].quality+") (Quality: "+target.limbs[limbNumber].quality/target.limbs[limbNumber].qualityStandard*100+"\%)"});
+						msg = JSON.stringify({"command":playerTools.printLimbStatus(target, limbNumber)});
 						socket.emit('log', msg);
 					} else {
 						//If none of the above options are true then the player just wants to know general info on the target.
 						//Print total health
-						msg = JSON.stringify({"command":"General Health: "+playerTools.healthTotal(target)/playerTools.healthTotalMax(target)*100+"\% ("+playerTools.healthTotal(target)+"/"+playerTools.healthTotalMax(target)+")"});
+						msg = JSON.stringify({"command":"General Health: "+(playerTools.healthTotal(target)/playerTools.healthTotalMax(target)*100).toFixed()+"\% ("+playerTools.healthTotal(target)+"/"+playerTools.healthTotalMax(target)+")"});
 							socket.emit('log', msg);
-						//Print limb health (in this case, for general overview, ONLY print a limb if a limb is injured)
+						//Print limb health (in this case, for general overview, ONLY print a limb if a limb is injured. Don't display more than 5 to avoid chat spam.)
+						var numInjured = 0;
 						for (var i = 0; i < target.limbs.length; i++) {
-							if (target.limbs[i].health < target.limbs[i].quality) {
-								msg = JSON.stringify({"command":target.limbs[i].type+" "+target.limbs[i].name+" (Health: "+target.limbs[i].health/target.limbs[i].quality*100+"\%) ("+target.limbs[i].health+"/"+target.limbs[i].quality+") (Quality: "+target.limbs[i].quality/target.limbs[i].qualityStandard*100+"\%)"});
-								socket.emit('log', msg);
+							if (target.limbs[i].health < target.limbs[i].quality || target.limbs[i].quality == 0) {
+								numInjured++;
+								if (numInjured <= 5) {
+									msg = JSON.stringify({"command":playerTools.printLimbStatus(target, i)});
+									socket.emit('log', msg);
+								};
 							};
+						};
+						if (numInjured > 5) {
+							msg = JSON.stringify({"command":"+"+(numInjured-5)+" more injured limbs."});
+							socket.emit('log', msg);
+							msg = JSON.stringify({"command":"(Use \"look [name] hp\" to see all limbs)."});
+							socket.emit('log', msg);
 						};
 						msg = JSON.stringify({"command":"Equipment: "+target.equipment});
 						socket.emit('log', msg);
