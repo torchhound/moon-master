@@ -105,7 +105,7 @@ exports.healthTotalMax = function(player) {
 	return tmp;
 };
 
-exports.move = function(direction, players, jsonOut, socket, clientLookup, io, map) {
+exports.move = function(direction, players, jsonOut, socketId, clientLookup, io, map) {
 	var position;
 	var playerIndex;
 	players.forEach(function(result, index) {
@@ -124,7 +124,7 @@ exports.move = function(direction, players, jsonOut, socket, clientLookup, io, m
 		case 'n':
 		case 'north':
 			if(position[0] === 0) { 
-				socket.emit('log', JSON.stringify({"command":"Cannot go any farther north"}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"Cannot go any farther north"}));
 				return false; 
 			};
 			break;
@@ -132,7 +132,7 @@ exports.move = function(direction, players, jsonOut, socket, clientLookup, io, m
 		case 'south':
 			var pTest = position[0] + 1;
 			if(pTest > map.map.length - 1) { 
-				socket.emit('log', JSON.stringify({"command":"Cannot go any farther south"}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"Cannot go any farther south"}));
 				return false;
 			};
 			break;
@@ -140,19 +140,19 @@ exports.move = function(direction, players, jsonOut, socket, clientLookup, io, m
 		case 'east':
 			var pTest = position[1] + 1;
 			if(pTest  > map.map.length - 1) {
-				socket.emit('log', JSON.stringify({"command":"Cannot go any farther east"}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"Cannot go any farther east"}));
 				return false;
 			};
 			break;
 		case 'w':
 		case 'west':
 			if(position[1] === 0) {
-				socket.emit('log', JSON.stringify({"command":"Cannot go any farther west"}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"Cannot go any farther west"}));
 				return false; 
 			};
 			break;
 		default:
-			socket.emit('log', JSON.stringify({'command':'An error occured in your movement'}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({'command':'An error occured in your movement'}));
 	};
 	for(var y in oldRoomOut.players) {
 		if(jsonOut.name.toLowerCase() === oldRoomOut.players[y]) {
@@ -178,7 +178,7 @@ exports.move = function(direction, players, jsonOut, socket, clientLookup, io, m
 			position[1]--;
 			break;
 		default:
-			socket.emit('log', JSON.stringify({'command':'An error occured in your movement'}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({'command':'An error occured in your movement'}));
 	};
 	p1 = position[0], 
 	p2 = position[1];
@@ -203,47 +203,47 @@ exports.move = function(direction, players, jsonOut, socket, clientLookup, io, m
 		switch(direction) {
 			case 'n':
 			case 'north': 
-				socket.emit('log', JSON.stringify({"command":"You moved north"}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You moved north"}));
 				break;
 			case 's':
 			case 'south':
-				socket.emit('log', JSON.stringify({"command":"You moved south"}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You moved south"}));
 				break;
 			case 'e':
 			case 'east':
-				socket.emit('log', JSON.stringify({"command":"You moved east"}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You moved east"}));
 				break;
 			case 'w':
 			case 'west':
-				socket.emit('log', JSON.stringify({"command":"You moved west"}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You moved west"}));
 				break;
 			default:
-				socket.emit('log', JSON.stringify({'command':'An error occured in your movement'}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({'command':'An error occured in your movement'}));
 		};
 	} else {
 		switch(direction) {
 		case 'n':
 		case 'north': 
 			console.log('move north: Player already exists in room');
-			socket.emit('log', JSON.stringify({'command':'move north: server error'})); 
+			io.of('/').to(socketId).emit('log', JSON.stringify({'command':'move north: server error'})); 
 			break;
 		case 's':
 		case 'south':
 			console.log('move south: Player already exists in room');
-			socket.emit('log', JSON.stringify({'command':'move south: server error'}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({'command':'move south: server error'}));
 			break;
 		case 'e':
 		case 'east':
 			console.log('move east: Player already exists in room');
-			socket.emit('log', JSON.stringify({'command':'move east: server error'}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({'command':'move east: server error'}));
 			break;
 		case 'w':
 		case 'west':
 			console.log('move west: Player already exists in room');
-			socket.emit('log', JSON.stringify({'command':'move west: server error'}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({'command':'move west: server error'}));
 			break;
 		default:
-			socket.emit('log', JSON.stringify({'command':'An error occured in your movement'}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({'command':'An error occured in your movement'}));
 		};
 	};
 	var playerOut = JSON.parse(players[playerIndex]);

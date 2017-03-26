@@ -1,6 +1,6 @@
 var exports = module.exports = {};
 
-exports.drop = function(item, jsonOut, socket, players, map, clientLookup) {
+exports.drop = function(item, jsonOut, socketId, players, map, clientLookup, io) {
 	var inventory;
 	var equipment;
 	var position;
@@ -23,7 +23,7 @@ exports.drop = function(item, jsonOut, socket, players, map, clientLookup) {
 		if(inventoryOut.name === item){
 			droppedItem = inventoryOut;
 			inventory.splice(index, 1);
-			socket.emit('log', JSON.stringify({"command":"You dropped "+item+" from your inventory"}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You dropped "+item+" from your inventory"}));
 			foundItem = true;
 		};
 	});
@@ -33,7 +33,7 @@ exports.drop = function(item, jsonOut, socket, players, map, clientLookup) {
 			if(equipmentOut.name === item){
 				droppedItem = equipmentOut;
 				equipment.splice(index, 1);
-				socket.emit('log', JSON.stringify({"command":"You dropped "+item+" from your equipment"}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You dropped "+item+" from your equipment"}));
 				foundItem = true;
 			};
 		});
@@ -51,7 +51,7 @@ exports.drop = function(item, jsonOut, socket, players, map, clientLookup) {
 	console.log('drop after player equipment: '+ playerOut.equipment); 
 };
 
-exports.pickup = function(item, jsonOut, socket, players, map, clientLookup) {
+exports.pickup = function(item, jsonOut, socketId, players, map, clientLookup, io) {
 	var inventory;
 	var position;
 	var pickupItem;
@@ -73,7 +73,7 @@ exports.pickup = function(item, jsonOut, socket, players, map, clientLookup) {
 		if(inventoryOut.name === item){
 			pickupItem = inventoryOut;
 			roomOut.inventory.splice(index, 1);
-			socket.emit('log', JSON.stringify({"command":"You picked up "+item}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You picked up "+item}));
 		};
 	});
 	map.map[p1][p2] = JSON.stringify(roomOut);
@@ -85,7 +85,7 @@ exports.pickup = function(item, jsonOut, socket, players, map, clientLookup) {
 	console.log('pickup after player inventory: '+ playerOut.inventory); 
 };
 
-exports.equip = function(item, jsonOut, socket, players, map, clientLookup) {
+exports.equip = function(item, jsonOut, socketId, players, map, clientLookup, io) {
 	var inventory;
 	var equipment;
 	var position;
@@ -109,7 +109,7 @@ exports.equip = function(item, jsonOut, socket, players, map, clientLookup) {
 		if(inventoryOut.name === item){
 			equipItem = inventoryOut;
 			inventory.splice(index, 1);
-			socket.emit('log', JSON.stringify({"command":"You equipped "+item+" from your inventory"}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You equipped "+item+" from your inventory"}));
 			foundItem = true;
 		};
 	});
@@ -119,7 +119,7 @@ exports.equip = function(item, jsonOut, socket, players, map, clientLookup) {
 			if(inventoryOut.name === item) {
 				equipItem = inventoryOut;
 				roomOut.inventory.splice(index, 1);
-				socket.emit('log', JSON.stringify({"command":"You equipped "+item+" from the ground"}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You equipped "+item+" from the ground"}));
 				map.map[p1][p2] = JSON.stringify(roomOut);
 				foundItem = true;
 			};
@@ -132,7 +132,7 @@ exports.equip = function(item, jsonOut, socket, players, map, clientLookup) {
 	players[playerIndex] = JSON.stringify(playerOut);
 };
 
-exports.unequip = function(item, jsonOut, socket, players, map, clientLookup) {
+exports.unequip = function(item, jsonOut, socketId, players, map, clientLookup, io) {
 	var inventory;
 	var equipment;
 	var unequipItem;
@@ -155,7 +155,7 @@ exports.unequip = function(item, jsonOut, socket, players, map, clientLookup) {
 		};
 	});
 	inventory.push(JSON.stringify(unequipItem));
-	socket.emit('log', JSON.stringify({"command":"You unequipped "+item}));
+	io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You unequipped "+item}));
 	var playerOut = JSON.parse(players[playerIndex]);
 	playerOut.inventory = inventory;
 	playerOut.equipment = equipment;

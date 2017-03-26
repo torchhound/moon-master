@@ -29,6 +29,7 @@ app.use(function(req, res) {
     res.render("not-found.html");
  });
 app.use(logError);
+app.use(gameLoop);
 map.create();
 var mapFile = fs.readFileSync('./map.json');
 var mapOut = JSON.parse(mapFile);
@@ -153,7 +154,7 @@ function gameLoop() {
 	clientLookup.forEach(function(result, index) {
 		result.queue[0].time = result.queue[0].time - 1;
 		if(result.queue[0].time === 0) {
-			cli.parse(result.queue[0], clientLookup, players, map);
+			cli.parse(result.queue[0], clientLookup, players, map, result.socketId, io);
 			clientLookup.splice(index, 1);
 		};
 		for(var x in result.queue) {
@@ -187,7 +188,5 @@ io.on('connection', function(socket){
 http.listen(port, function() {
 	console.log("Listening on port " + port);
 });
-
-gameLoop();
 
 module.exports = app;
