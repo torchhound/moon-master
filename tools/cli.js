@@ -67,16 +67,56 @@ exports.parse = function(socket, io, clientLookup, players, map) {
 			msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
     		io.emit('chat', msg);	
 		}
+		//Standard Attack function
+		else if(commandSplit[0] == 'a') {
+			if(commandSplit[1] == null) {
+				socket.emit('log', JSON.stringify({"command":"You must specify what you want to attack!"}));
+			} else {
+				var playerPos = [-1, -1];
+				var targetPos = [-2, -2];
+				var player;
+				var target;
+				var playerIndex;
+				var targetIndex;
+				//Get the position of the player and the player's target
+				players.forEach(function(result, index) {
+					var playerOut = JSON.parse(result);
+					if(jsonOut.name.toLowerCase() === playerOut.name) {
+						playerPos = playerOut.position;
+						player = playerOut;
+						playerIndex = index;
+					};
+					if (commandSplit[1] === playerOut.name) {
+						targetPos = playerOut.position;
+						target = playerOut;
+						targetIndex = index;
+					};
+				});					
+				//If positions are the same, output info on target
+				if (playerPos[0] == targetPos[0] && playerPos[1] == targetPos[1]) {
+					//Determine what type of weapon player is using. (For now, it is just 'unarmed')
+					//Roll skill to see if player hits or misses the target
+					//Determine what body part is hit
+					var limbHit = playerTools.getLimbRand(target, player.stances[0]);
+					//Apply damage
+					msg = JSON.stringify({"command":"wowee u sure attacked them"});
+					socket.emit('log', msg);
+				}
+				else {
+					msg = JSON.stringify({"command":"There is no such thing to attack!"});
+					socket.emit('log', msg);
+				};
+			};
+		}
 		//Grind is a temporary skill but this can be used as the base for most self-only skills.
 		else if(commandSplit[0] === 'grind') {
 			players.forEach(function(result, index) {
 				var playerOut = JSON.parse(result);
 				if (jsonOut.name.toLowerCase() === playerOut.name.toLowerCase()) {
-					msg = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
-					//Success Condition
-					if (msg == "") msg = "Success!";
-					//Fail Condition
-					else players[index] = JSON.stringify(playerOut);
+					skillOut = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
+					msg = skillOut.text;
+					//If EXP has changed, update player
+					if (skillOut.success == false) players[index] = JSON.stringify(playerOut);
 					socket.emit('log', JSON.stringify({"command":msg}));
 				};
 			});

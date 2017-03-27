@@ -2,12 +2,16 @@ module.exports = class Player {
 	constructor(name){
 		this.namePrint = name;
 		this.name = name.toLowerCase();
+		//Stances are just simple integer values.
+		//The 'stances' array contains all of a player's stances.
+		//0: Combat stance. 0: Lethal
+		this.stances = [0];
 		//Skills are stored in an array so that they may be indexed through. For example, for printing info on skills, reducing all experience on death,
 		//Or whatever other purposes you can think of.
 		this.skills = [];
 		//A skill object is made up of name (the printed name), Rank in the skill, and EXP in the skill
 		this.skills[0] = {name:"Grinding", rank:1, exp:0};
-		this.skills[1] = {name:"im gay", rank:1, exp:0};
+		this.skills[1] = {name:"Unarmed", rank:1, exp:0};
 		this.skills[2] = {name:"fakeskill", rank:1, exp:0};
 		//Limbs are stored in a similar method to skills, as above: An array of objects.
 		//name: name of limb, used mostly for display but also for finding the limb when the player enters text.

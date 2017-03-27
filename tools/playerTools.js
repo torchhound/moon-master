@@ -10,12 +10,15 @@ const HEALTH_TO_LIVE = 2;
 //Takes in a skill, the base chance the check will succeed, the chance increase (in percentile points) per rank in the skill, and the exp awarded for trying and failing. 
 //returns "" on a success, or information about the failure if you failed.
 exports.skillCheck = function(player, skill, successBase, successSkillMod, exp) {
-	roll = Math.floor((Math.random() * 100) + 1)-(player.skills[skill].rank*successSkillMod);
+	var roll = Math.floor((Math.random() * 100) + 1)-(player.skills[skill].rank*successSkillMod);
+	returnPacket = {text:"", success:false};
 	if (roll <= successBase) {
-		return "";
+		returnPacket.text = "Success!";
+		returnPacket.success = true;
 	} else {
-		return "Failure! (" + exports.skillIncrease(player, skill, exp) + ")"; 
+		returnPacket.text = "Failure! (" + exports.skillIncrease(player, skill, exp) + ")"; 
 	};
+	return returnPacket;
 };
 	
 //Takes in a skill, adds exp to it, checks for rank increase(s), returns a string with information if you want to show it to the player.
@@ -50,6 +53,38 @@ exports.setLimbHealth = function(player, limbNum, adjustment) {
 	};
 	console.log("after: "+player.limbs[limbNum].health);
 	return player.limbs[limbNum].health;
+};
+
+//Pick a random body part for the purpose of targeting 
+//Uses a different table for different stances.
+exports.getLimbRand = function(player, stance) {
+	var output = -1;
+	if (stance == 0) {
+		var odds = [20, 2, 3, 5, 10, 2, 2, 13, 13, 13, 13, 1, 1, 1, 1];
+	};
+	//Check that all limbs are not destroyed
+	var anyLimb = false;
+	for (var i = 0; i < player.limbs.length; i++) {
+		if (player.limbs[i].health > 0) anyLimb = true;
+	};
+	if (anyLimb = false) {
+		console.log("WARNING: PLAYER "+player.namePrint+" WAS TARGETED FOR AN ATTACK BUT HAS NO LIMBS");
+		return 0;
+	};
+	while (output < 0) {
+		var roll = Math.floor((Math.random() * 100) + 1);
+		var limbChoice = 0;
+		while (roll > odds[limbChoice]) {
+			roll -= odds[limbChoice];
+			limbChoice++;
+		};
+		if (player.limbs[limbChoice].health > 0) { 
+			output = limbChoice;
+			console.log(roll);
+			console.log(player.limbs[output].name)
+		};
+	};
+	return output;
 };
 
 //Pick out a limb from the player, based on text input the player gives.
