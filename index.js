@@ -40,7 +40,7 @@ function logError(error, req, res, next){
 	next(error);
 };
 
-function parseCommand(socket, io, clientLookup) { //TODO(torchhound) not sure if socket and io are necessary parameters, move this function to a different file
+function parseCommand(socket, io, clientLookup) { 
 	return function(msg){
 		var jsonOut = JSON.parse(msg);
 		//commandSplit is each separate word of the command, which we will use to determine what actions the player wants to take.
@@ -71,7 +71,8 @@ function parseCommand(socket, io, clientLookup) { //TODO(torchhound) not sure if
 		
 		//Determine what function is being called;
 		if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
-			var seconds = new Date() / 1000; //TODO(torchhound) round this to nearest whole number
+			var seconds = new Date() / 1000; 
+			seconds = Math.round(seconds);
 			var time = seconds + 0;
 			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
@@ -82,6 +83,7 @@ function parseCommand(socket, io, clientLookup) { //TODO(torchhound) not sure if
 		}
 		else if(commandSplit[0] === 'grind') {
 			var seconds = new Date() / 1000;
+			seconds = Math.round(seconds);
 			var time = seconds + 0;
 			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
@@ -92,6 +94,7 @@ function parseCommand(socket, io, clientLookup) { //TODO(torchhound) not sure if
 		}
 		else if(commandSplit[0] === 'combat') {
 			var seconds = new Date() / 1000;
+			seconds = Math.round(seconds);
 			var time = seconds + 0;
 			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
@@ -102,6 +105,7 @@ function parseCommand(socket, io, clientLookup) { //TODO(torchhound) not sure if
 		}
 		else if(commandSplit[0] === 'pickup'  || commandSplit[0] === 'g' || commandSplit[0] === 'take' || commandSplit[0] === 'get' || commandSplit[0] === 'grab' || commandSplit[0] === 'pick') {
 			var seconds = new Date() / 1000;
+			seconds = Math.round(seconds);
 			var time = seconds + 1;
 			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
@@ -112,6 +116,7 @@ function parseCommand(socket, io, clientLookup) { //TODO(torchhound) not sure if
 		}
 		else if(commandSplit[0] === 'drop' || commandSplit[0] === 'd') {
 			var seconds = new Date() / 1000;
+			seconds = Math.round(seconds);
 			var time = seconds + 1;
 			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
@@ -122,6 +127,7 @@ function parseCommand(socket, io, clientLookup) { //TODO(torchhound) not sure if
 		}
 		else if(commandSplit[0] === 'equip' || commandSplit[0] === 'q') {
 			var seconds = new Date() / 1000;
+			seconds = Math.round(seconds);
 			var time = seconds + 1;
 			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
@@ -132,6 +138,7 @@ function parseCommand(socket, io, clientLookup) { //TODO(torchhound) not sure if
 		}
 		else if(commandSplit[0] === 'unequip' || commandSplit[0] === 'u') {
 			var seconds = new Date() / 1000;
+			seconds = Math.round(seconds);
 			var time = seconds + 1;
 			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
@@ -142,6 +149,7 @@ function parseCommand(socket, io, clientLookup) { //TODO(torchhound) not sure if
 		}
 		else if(commandSplit[0] === 'move' || commandSplit[0] === 'go') {
 			var seconds = new Date() / 1000;
+			seconds = Math.round(seconds);
 			var time = seconds + 3;
 			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
@@ -152,6 +160,7 @@ function parseCommand(socket, io, clientLookup) { //TODO(torchhound) not sure if
 		}
 		else if(commandSplit[0] === 'look' || commandSplit[0] === 'l' || commandSplit[0] === 'x' || commandSplit[0] === 'ex' ||commandSplit[0] === 'examine') {
 			var seconds = new Date() / 1000;
+			seconds = Math.round(seconds);
 			var time = seconds + 1;
 			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
@@ -169,19 +178,19 @@ function parseCommand(socket, io, clientLookup) { //TODO(torchhound) not sure if
 
 function gameLoop() {
 	clientLookup.forEach(function(result, index) {
-		var seconds = new Date() / 1000; //TODO(torchhound) round this to nearest whole number
-		var lock = false;
+		var seconds = new Date() / 1000; 
+		seconds = Math.round(seconds);
 		if(result.queue[0] === undefined) {
-			lock = true;
+			//pass
 		}
-		if(lock === false) {
-			if(result.queue[0].time >= seconds) {
-				cli.parse(result.queue[0], clientLookup, players, map, result.socketId, io);
-				clientLookup.splice(index, 1);
-			};/* //TODO(torchhound) if left uncommented causes a crash with command is undefined
+		else if(result.queue[0].time >= seconds) {
+			cli.parse(result.queue[0], clientLookup, players, mapJson, result.socketId, io); 
+			result.queue.splice(index, 1);
+		}; 
+		if(result.queue[0] != undefined) {
 			for(var x in result.queue) {
-				io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":result.queue[x].jsonOut.command}));
-			};*/
+				io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":result.queue[x].json.command}));
+			};
 		};
 	});
 	setImmediate(gameLoop);
