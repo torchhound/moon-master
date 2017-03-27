@@ -43,6 +43,6 @@ socket.on('combat', function(msg) {
 socket.on('queue', function(msg) {
   var jsonOut = JSON.parse(msg);
   var queue = jsonOut.namePrint;
-  $('#queue').append($('<li>').text(queue + '\n')); //TODO(torchhound) need to display this item by item instead of all in a block
+  $('#queue').append($('<li>').text(queue + '\n')); 
   document.getElementById('queue').scrollIntoView(false);
  });

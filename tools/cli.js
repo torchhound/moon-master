@@ -8,7 +8,8 @@ var exports = module.exports = {};
 
 //parses commands
 exports.parse = function(packet, clientLookup, players, map, socketId, io) {
-	var jsonOut = packet.jsonOut;
+	console.log(packet);
+	var jsonOut = packet.json;
 	var commandSplit = packet.commandSplit;
 	//If command is 't' or 'say' then 'Local Chat'
 	if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
@@ -90,6 +91,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			foundTarget = true;
 		} else if(commandSplit[1] === 'room'){
 			//Examine Room
+			console.log(map);
 			for(var x = 0; x < map.map.length; x++) {
 				var row = map.map[x];
 				for(var y = 0; y < row.length; y++) {
