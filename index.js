@@ -42,6 +42,7 @@ function logError(error, req, res, next){
 
 function parseCommand(socket, io, clientLookup) { 
 	return function(msg){
+		console.log('parseCommand');
 		var jsonOut = JSON.parse(msg);
 		//commandSplit is each separate word of the command, which we will use to determine what actions the player wants to take.
 		//commandSplit is also put in lowercase for comparison with command words, which should all be lower case.
@@ -71,101 +72,110 @@ function parseCommand(socket, io, clientLookup) {
 		
 		//Determine what function is being called;
 		if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
-			var seconds = new Date() / 1000; 
-			seconds = Math.round(seconds);
-			var time = seconds + 0;
-			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
+			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
+					var seconds = new Date() / 1000; 
+					seconds = Math.round(seconds);
+					var time = seconds + 0;
+					result.timer = time;
 				};
 			});
 		}
 		else if(commandSplit[0] === 'grind') {
-			var seconds = new Date() / 1000;
-			seconds = Math.round(seconds);
-			var time = seconds + 0;
-			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
+			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
+					var seconds = new Date() / 1000; 
+					seconds = Math.round(seconds);
+					var time = seconds + 0;
+					result.timer = time;
 				};
 			});
 		}
 		else if(commandSplit[0] === 'combat') {
-			var seconds = new Date() / 1000;
-			seconds = Math.round(seconds);
-			var time = seconds + 0;
-			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
+			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
+					var seconds = new Date() / 1000; 
+					seconds = Math.round(seconds);
+					var time = seconds + 0;
+					result.timer = time;
 				};
 			});
 		}
 		else if(commandSplit[0] === 'pickup'  || commandSplit[0] === 'g' || commandSplit[0] === 'take' || commandSplit[0] === 'get' || commandSplit[0] === 'grab' || commandSplit[0] === 'pick') {
-			var seconds = new Date() / 1000;
-			seconds = Math.round(seconds);
-			var time = seconds + 1;
-			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
+			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
+					var seconds = new Date() / 1000; 
+					seconds = Math.round(seconds);
+					var time = seconds + 0;
+					result.timer = time;
 				};
 			});
 		}
 		else if(commandSplit[0] === 'drop' || commandSplit[0] === 'd') {
-			var seconds = new Date() / 1000;
-			seconds = Math.round(seconds);
-			var time = seconds + 1;
-			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
+			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
+					var seconds = new Date() / 1000; 
+					seconds = Math.round(seconds);
+					var time = seconds + 0;
+					result.timer = time;
 				};
 			});
 		}
 		else if(commandSplit[0] === 'equip' || commandSplit[0] === 'q') {
-			var seconds = new Date() / 1000;
-			seconds = Math.round(seconds);
-			var time = seconds + 1;
-			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
+			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
+					var seconds = new Date() / 1000; 
+					seconds = Math.round(seconds);
+					var time = seconds + 0;
+					result.timer = time;
 				};
 			});
 		}
 		else if(commandSplit[0] === 'unequip' || commandSplit[0] === 'u') {
-			var seconds = new Date() / 1000;
-			seconds = Math.round(seconds);
-			var time = seconds + 1;
-			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
+			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
+					var seconds = new Date() / 1000; 
+					seconds = Math.round(seconds);
+					var time = seconds + 0;
+					result.timer = time;
 				};
 			});
 		}
 		else if(commandSplit[0] === 'move' || commandSplit[0] === 'go') {
-			var seconds = new Date() / 1000;
-			seconds = Math.round(seconds);
-			var time = seconds + 3;
-			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
+			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
+					var seconds = new Date() / 1000; 
+					seconds = Math.round(seconds);
+					var time = seconds + 0;
+					result.timer = time;
 				};
 			});
 		}
 		else if(commandSplit[0] === 'look' || commandSplit[0] === 'l' || commandSplit[0] === 'x' || commandSplit[0] === 'ex' ||commandSplit[0] === 'examine') {
-			var seconds = new Date() / 1000;
-			seconds = Math.round(seconds);
-			var time = seconds + 1;
-			var parsePacket = {json:jsonOut, time:time, commandSplit:commandSplit};
+			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
+					var seconds = new Date() / 1000; 
+					seconds = Math.round(seconds);
+					var time = seconds + 0;
+					result.timer = time;
 				};
 			});
 		}
@@ -183,8 +193,20 @@ function gameLoop() {
 		if(result.queue[0] === undefined) {
 			//pass
 		}
-		else if(result.queue[0].time >= seconds) {
-			cli.parse(result.queue[0], clientLookup, players, mapJson, result.socketId, io); 
+		else if(result.queue.length === 1) {
+			var check = cli.parse(result.queue[0], clientLookup, players, mapJson, result.socketId, io);
+			if(check == false) {
+				result.timer = 0; //TODO(torchhound) seconds or 0?
+				console.log('gameLoop check false');
+			};
+			result.queue.splice(index, 1);
+		}
+		else if(result.timer <= seconds) {
+			var check = cli.parse(result.queue[0], clientLookup, players, mapJson, result.socketId, io);
+			if(check == false) {
+				result.timer = 0; //TODO(torchhound) seconds or 0?
+				console.log('gameLoop check false');
+			};
 			result.queue.splice(index, 1);
 		}; 
 		if(result.queue[0] != undefined) {

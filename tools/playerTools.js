@@ -153,6 +153,7 @@ exports.move = function(direction, players, jsonOut, socketId, clientLookup, io,
 			break;
 		default:
 			io.of('/').to(socketId).emit('log', JSON.stringify({'command':'An error occured in your movement'}));
+			return false;
 	};
 	for(var y in oldRoomOut.players) {
 		if(jsonOut.name.toLowerCase() === oldRoomOut.players[y]) {
@@ -251,4 +252,5 @@ exports.move = function(direction, players, jsonOut, socketId, clientLookup, io,
 	players[playerIndex] = JSON.stringify(playerOut);
 	console.log('end position: '+position);
 	console.log('end map: '+map.map);
+	return true;
 };

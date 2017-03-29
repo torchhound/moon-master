@@ -38,6 +38,9 @@ exports.drop = function(item, jsonOut, socketId, players, map, clientLookup, io)
 			};
 		});
 	};
+	if(foundItem == false) {
+		return false;
+	};
 	var p1 = position[0], 
 		p2 = position[1];
 	var roomOut = JSON.parse(map.map[p1][p2]);
@@ -48,7 +51,8 @@ exports.drop = function(item, jsonOut, socketId, players, map, clientLookup, io)
 	playerOut.equipment = equipment;
 	players[playerIndex] = JSON.stringify(playerOut);
 	console.log('drop after player inventory: '+ playerOut.inventory); 
-	console.log('drop after player equipment: '+ playerOut.equipment); 
+	console.log('drop after player equipment: '+ playerOut.equipment);
+	return true;
 };
 
 exports.pickup = function(item, jsonOut, socketId, players, map, clientLookup, io) {
@@ -56,6 +60,7 @@ exports.pickup = function(item, jsonOut, socketId, players, map, clientLookup, i
 	var position;
 	var pickupItem;
 	var playerIndex;
+	var foundItem;
 	players.forEach(function(result, index) { 
 		var playerOut = JSON.parse(result);
 		if(playerOut.name === jsonOut.name.toLowerCase()) {
@@ -74,8 +79,12 @@ exports.pickup = function(item, jsonOut, socketId, players, map, clientLookup, i
 			pickupItem = inventoryOut;
 			roomOut.inventory.splice(index, 1);
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You picked up "+item}));
+			foundItem = true;
 		};
 	});
+	if(foundItem == false) {
+		return false;
+	};
 	map.map[p1][p2] = JSON.stringify(roomOut);
 	inventory.push(JSON.stringify(pickupItem));
 	console.log(inventory);
@@ -83,6 +92,7 @@ exports.pickup = function(item, jsonOut, socketId, players, map, clientLookup, i
 	playerOut.inventory = inventory;
 	players[playerIndex] = JSON.stringify(playerOut);
 	console.log('pickup after player inventory: '+ playerOut.inventory); 
+	return true;
 };
 
 exports.equip = function(item, jsonOut, socketId, players, map, clientLookup, io) {
@@ -125,11 +135,15 @@ exports.equip = function(item, jsonOut, socketId, players, map, clientLookup, io
 			};
 		});
 	};
+	if(foundItem == false) {
+		return false;
+	};
 	equipment.push(JSON.stringify(equipItem));
 	var playerOut = JSON.parse(players[playerIndex]);
 	playerOut.inventory = inventory;
 	playerOut.equipment = equipment;
 	players[playerIndex] = JSON.stringify(playerOut);
+	return true;
 };
 
 exports.unequip = function(item, jsonOut, socketId, players, map, clientLookup, io) {
@@ -137,6 +151,7 @@ exports.unequip = function(item, jsonOut, socketId, players, map, clientLookup, 
 	var equipment;
 	var unequipItem;
 	var playerIndex;
+	var foundItem = false;
 	players.forEach(function(result, index) { 
 		var playerOut = JSON.parse(result);
 		if(playerOut.name === jsonOut.name.toLowerCase()) {
@@ -152,8 +167,12 @@ exports.unequip = function(item, jsonOut, socketId, players, map, clientLookup, 
 		if(equipmentOut.name === item){
 			unequipItem = equipmentOut;
 			equipment.splice(index, 1);
+			foundItem = true;
 		};
 	});
+	if(foundItem == false) {
+		return false;
+	};
 	inventory.push(JSON.stringify(unequipItem));
 	io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You unequipped "+item}));
 	var playerOut = JSON.parse(players[playerIndex]);
@@ -161,4 +180,5 @@ exports.unequip = function(item, jsonOut, socketId, players, map, clientLookup, 
 	playerOut.equipment = equipment;
 	players[playerIndex] = JSON.stringify(playerOut);
 	console.log('unequip after player equipment: '+ playerOut.equipment); 
+	return true;
 };

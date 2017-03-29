@@ -15,6 +15,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 	if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
 		msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
 		io.emit('chat', msg);	
+		return true;
 	}
 	//Grind is a temporary skill but this can be used as the base for most self-only skills.
 	else if(commandSplit[0] === 'grind') {
@@ -27,60 +28,78 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 				//Fail Condition
 				else players[index] = JSON.stringify(playerOut);
 				io.of('/').to(socketId).emit('log', JSON.stringify({"command":msg}));
+				return true;
 			};
 		});
 	}
 	else if(commandSplit[0] === 'combat') {
 		if(commandSplit[1] == null){
 			io.of('/').to(socketId).emit('combat', JSON.stringify({"queue":"No queued action", "log":"Intentionally left blank"}));
+			return true;
 		} else {
 			io.of('/').to(socketId).emit('combat', JSON.stringify({"queue":commandSplit[1], "log":"Intentionally left blank"}));
+			return true;
 		};
 	}
 	else if(commandSplit[0] === 'pickup'  || commandSplit[0] === 'g' || commandSplit[0] === 'take' || commandSplit[0] === 'get' || commandSplit[0] === 'grab' || commandSplit[0] === 'pick') {
 		if(commandSplit[1] == null){
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
+			return false;
 		} else if(commandSplit[1] != null) {
-			itemTools.pickup(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			var check = itemTools.pickup(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			return check;
 		} else {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
+			return false;
 		};
 	}
 	else if(commandSplit[0] === 'drop' || commandSplit[0] === 'd') {
 		if(commandSplit[1] == null){
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
+			return false;
 		} else if(commandSplit[1] != null) { 
-			itemTools.drop(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			var check = itemTools.drop(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			return check;
 		} else {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
+			return false;
 		};
 	}
 	else if(commandSplit[0] === 'equip' || commandSplit[0] === 'q') {
 		if(commandSplit[1] == null){
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to equip"}));
+			return false;
 		} else if(commandSplit[1] != null) { 
-			itemTools.equip(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			var check = itemTools.equip(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			return check;
 		} else {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to equip"}));
+			return false;
 		};
 	}
 	else if(commandSplit[0] === 'unequip' || commandSplit[0] === 'u') {
 		if(commandSplit[1] == null){
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to unequip"}));
+			return false;
 		} else if(commandSplit[1] != null) { 
-			itemTools.unequip(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			var check = itemTools.unequip(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			return check;
 		} else {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to unequip"}));
+			return false;
 		};
 	}
 	//If command is "move"
 	else if(commandSplit[0] === 'move' || commandSplit[0] === 'go') {
 		if(commandSplit[1] == null){
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to move to"}));
+			return false;
 		} else if(commandSplit[1] != null) { 
-			playerTools.move(commandSplit[1], players, jsonOut, socketId, clientLookup, io, map);
+			var check = playerTools.move(commandSplit[1], players, jsonOut, socketId, clientLookup, io, map);
+			return check;
 		} else {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to move to"}));
+			return false;
 		};
 	}
 	//If command is "examine"
@@ -89,6 +108,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 		if(commandSplit[1] == null) {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You must specify what you want to look at!"}));
 			foundTarget = true;
+			return false;
 		} else if(commandSplit[1] === 'room'){
 			//Examine Room
 			for(var x = 0; x < map.map.length; x++) {
@@ -100,6 +120,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 							msg = JSON.stringify({"command":"examine: "+roomOut.name+"; Players: "+roomOut.players+"; Contents: "+roomOut.inventory});
 							io.of('/').to(socketId).emit('log', msg);
 							foundTarget = true;
+							return true;
 						};
 					};
 				};
@@ -138,16 +159,18 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						msg = JSON.stringify({"command":target.limbs[i].type+" "+target.limbs[i].name+" (Health: "+target.limbs[i].health/target.limbs[i].quality*100+"\%) ("+target.limbs[i].health+"/"+target.limbs[i].quality+") (Quality: "+target.limbs[i].quality/target.limbs[i].qualityStandard*100+"\%)"});
 						io.of('/').to(socketId).emit('log', msg);
 					};
+					return true;
 				}
 				else if (limbNumber != -1) {
 					//Player wants to know about a specific limb
 					msg = JSON.stringify({"command":target.limbs[limbNumber].type+" "+target.limbs[limbNumber].name+" (Health: "+target.limbs[limbNumber].health/target.limbs[limbNumber].quality*100+"\%) ("+target.limbs[limbNumber].health+"/"+target.limbs[limbNumber].quality+") (Quality: "+target.limbs[limbNumber].quality/target.limbs[limbNumber].qualityStandard*100+"\%)"});
 					io.of('/').to(socketId).emit('log', msg);
+					return true;
 				} else {
 					//If none of the above options are true then the player just wants to know general info on the target.
 					//Print total health
 					msg = JSON.stringify({"command":"General Health: "+playerTools.healthTotal(target)/playerTools.healthTotalMax(target)*100+"\% ("+playerTools.healthTotal(target)+"/"+playerTools.healthTotalMax(target)+")"});
-						io.of('/').to(socketId).emit('log', msg);
+					io.of('/').to(socketId).emit('log', msg);
 					//Print limb health (in this case, for general overview, ONLY print a limb if a limb is injured)
 					for (var i = 0; i < target.limbs.length; i++) {
 						if (target.limbs[i].health < target.limbs[i].quality) {
@@ -162,7 +185,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						msg = JSON.stringify({"command":target.skills[i].name+": Rank "+target.skills[i].rank+" (EXP: "+target.skills[i].exp+"/"+playerTools.expNeeded(target.skills[i].rank)+")"});
 						io.of('/').to(socketId).emit('log', msg);
 					};	
-						
+					return true;	
 				};
 			};
 			//Examine Item
@@ -177,6 +200,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						console.log(inventoryOut);
 						io.of('/').to(socketId).emit('log', JSON.stringify({"command":inventoryOut.name})); //TODO(torchhound) add more item attributes
 						foundTarget = true;
+						return true;
 					};
 				});
 				for(var y in roomOut.players) { //Examine item in any player's equipment in the current room
@@ -188,6 +212,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 								if(equipmentOut.name === commandSplit[1]) {
 									io.of('/').to(socketId).emit('log', JSON.stringify({"command":equipmentOut.name}));
 									foundTarget = true;
+									return true;
 								};
 							};
 						};
@@ -200,6 +225,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 							console.log(inventoryOut);
 							io.of('/').to(socketId).emit('log', JSON.stringify({"command":inventoryOut.name})); //TODO(torchhound) add more item attributes
 							foundTarget = true;
+							return true;
 						};
 					});
 				};
@@ -208,11 +234,13 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 		if (foundTarget == false) {
 			msg = JSON.stringify({"command":"There is no such thing to look at!"});
 			io.of('/').to(socketId).emit('log', msg);
+			return false;
 		};
 	}
 	//If command is not a valid command
 	else {
 		msg = JSON.stringify({"command":"Invalid Command: "+jsonOut.command});
 		io.of('/').to(socketId).emit('log', msg);
+		return false;
 	};
 };
