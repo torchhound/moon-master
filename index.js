@@ -114,7 +114,7 @@ function parseCommand(socket, io, clientLookup) {
 					result.queue.push(parsePacket);
 					var seconds = new Date() / 1000; 
 					seconds = Math.round(seconds);
-					var time = seconds + 0;
+					var time = seconds + 1;
 					result.timer = time;
 				};
 			});
@@ -126,7 +126,7 @@ function parseCommand(socket, io, clientLookup) {
 					result.queue.push(parsePacket);
 					var seconds = new Date() / 1000; 
 					seconds = Math.round(seconds);
-					var time = seconds + 0;
+					var time = seconds + 1;
 					result.timer = time;
 				};
 			});
@@ -138,7 +138,7 @@ function parseCommand(socket, io, clientLookup) {
 					result.queue.push(parsePacket);
 					var seconds = new Date() / 1000; 
 					seconds = Math.round(seconds);
-					var time = seconds + 0;
+					var time = seconds + 1;
 					result.timer = time;
 				};
 			});
@@ -150,7 +150,7 @@ function parseCommand(socket, io, clientLookup) {
 					result.queue.push(parsePacket);
 					var seconds = new Date() / 1000; 
 					seconds = Math.round(seconds);
-					var time = seconds + 0;
+					var time = seconds + 1;
 					result.timer = time;
 				};
 			});
@@ -162,7 +162,7 @@ function parseCommand(socket, io, clientLookup) {
 					result.queue.push(parsePacket);
 					var seconds = new Date() / 1000; 
 					seconds = Math.round(seconds);
-					var time = seconds + 0;
+					var time = seconds + 3;
 					result.timer = time;
 				};
 			});
@@ -174,7 +174,7 @@ function parseCommand(socket, io, clientLookup) {
 					result.queue.push(parsePacket);
 					var seconds = new Date() / 1000; 
 					seconds = Math.round(seconds);
-					var time = seconds + 0;
+					var time = seconds + 1;
 					result.timer = time;
 				};
 			});
@@ -187,7 +187,7 @@ function parseCommand(socket, io, clientLookup) {
 };
 
 function gameLoop() {
-	clientLookup.forEach(function(result, index) {
+	clientLookup.forEach(function(result, index) {	
 		var seconds = new Date() / 1000; 
 		seconds = Math.round(seconds);
 		if(result.queue[0] === undefined) {
@@ -201,19 +201,19 @@ function gameLoop() {
 			};
 			result.queue.splice(index, 1);
 		}
-		else if(result.timer <= seconds) {
+		else if(result.timer < seconds) {
 			var check = cli.parse(result.queue[0], clientLookup, players, mapJson, result.socketId, io);
+			io.of('/').to(result.socketId).emit('queue', JSON.stringify({"timer":result.timer})); //TODO(torchhound) these emits do not work
+			for(var x in result.queue) {
+				console.log(result.queue[x].json.command);
+				io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":result.queue[x].json.command}));
+			};
 			if(check == false) {
 				result.timer = 0; //TODO(torchhound) seconds or 0?
 				console.log('gameLoop check false');
 			};
 			result.queue.splice(index, 1);
 		}; 
-		if(result.queue[0] != undefined) {
-			for(var x in result.queue) {
-				io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":result.queue[x].json.command}));
-			};
-		};
 	});
 	setImmediate(gameLoop);
 };

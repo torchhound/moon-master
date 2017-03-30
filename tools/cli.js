@@ -8,7 +8,6 @@ var exports = module.exports = {};
 
 //parses commands
 exports.parse = function(packet, clientLookup, players, map, socketId, io) {
-	console.log(packet);
 	var jsonOut = packet.json;
 	var commandSplit = packet.commandSplit;
 	//If command is 't' or 'say' then 'Local Chat'

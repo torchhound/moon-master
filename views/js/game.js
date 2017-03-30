@@ -5,6 +5,11 @@ loginObj.name = localStorage.getItem('name');
 var loginJsonString= JSON.stringify(loginObj);
 socket.emit('login', loginJsonString);
 
+function countdown(count) {
+  $('#timer').val(count);
+  setInterval(countdown(count--), 1000);
+};
+
 $("#submit").click(function() {
     var obj = new Object();
    	obj.name = localStorage.getItem('name');
@@ -13,14 +18,14 @@ $("#submit").click(function() {
     socket.emit('command', jsonString);
    	$('#cli').val('');
     return false;
- });
+});
 
 socket.on('log', function(msg) {
 	var jsonOut = JSON.parse(msg);
 	var command = jsonOut.command;
   $('#log').append($('<li>').text(command + '\n'));
   document.getElementById('log').scrollIntoView(false);
- });
+});
 
 socket.on('chat', function(msg) {
 	var jsonOut = JSON.parse(msg);
@@ -28,7 +33,7 @@ socket.on('chat', function(msg) {
 	var command = jsonOut.command;
   $('#chat').append($('<li>').text(name + ': ' + command + '\n'));
   document.getElementById('chat').scrollIntoView(false);
- });
+});
 
 socket.on('combat', function(msg) {
   var jsonOut = JSON.parse(msg);
@@ -42,7 +47,9 @@ socket.on('combat', function(msg) {
 
 socket.on('queue', function(msg) {
   var jsonOut = JSON.parse(msg);
-  var queue = jsonOut.namePrint;
+  var queue = jsonOut.queue;
+  var timer = jsonOut.timer;
   $('#queue').append($('<li>').text(queue + '\n')); 
+  countdown(timer);
   document.getElementById('queue').scrollIntoView(false);
- });
+});
