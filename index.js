@@ -44,6 +44,7 @@ function parseCommand(socket, io, clientLookup) {
 	return function(msg){
 		console.log('parseCommand');
 		var jsonOut = JSON.parse(msg);
+		var nameLower = jsonOut.name.toLowerCase();
 		//commandSplit is each separate word of the command, which we will use to determine what actions the player wants to take.
 		//commandSplit is also put in lowercase for comparison with command words, which should all be lower case.
 		//Note that jsonOut.command has not been modified as we wish to preserve the exact spacing of the original message.
@@ -74,7 +75,7 @@ function parseCommand(socket, io, clientLookup) {
 		if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
-				if(result.name === jsonOut.name) {
+				if(result.name === nameLower) {
 					result.queue.push(parsePacket);
 				}; 
 			}); 
@@ -82,7 +83,7 @@ function parseCommand(socket, io, clientLookup) {
 		else if(commandSplit[0] === 'grind') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
-				if(result.name === jsonOut.name) {
+				if(result.name === nameLower) {
 					result.queue.push(parsePacket);
 				};
 			});
@@ -90,7 +91,7 @@ function parseCommand(socket, io, clientLookup) {
 		else if(commandSplit[0] === 'combat') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
-				if(result.name === jsonOut.name) {
+				if(result.name === nameLower) {
 					result.queue.push(parsePacket);
 				};
 			});
@@ -98,7 +99,7 @@ function parseCommand(socket, io, clientLookup) {
 		else if(commandSplit[0] === 'pickup'  || commandSplit[0] === 'g' || commandSplit[0] === 'take' || commandSplit[0] === 'get' || commandSplit[0] === 'grab' || commandSplit[0] === 'pick') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
-				if(result.name === jsonOut.name) {
+				if(result.name === nameLower) {
 					result.queue.push(parsePacket);
 				};
 			});
@@ -106,7 +107,7 @@ function parseCommand(socket, io, clientLookup) {
 		else if(commandSplit[0] === 'drop' || commandSplit[0] === 'd') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
-				if(result.name === jsonOut.name) {
+				if(result.name === nameLower) {
 					result.queue.push(parsePacket);
 				};
 			});
@@ -114,7 +115,7 @@ function parseCommand(socket, io, clientLookup) {
 		else if(commandSplit[0] === 'equip' || commandSplit[0] === 'q') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
-				if(result.name === jsonOut.name) {
+				if(result.name === nameLower) {
 					result.queue.push(parsePacket);
 				};
 			});
@@ -122,7 +123,7 @@ function parseCommand(socket, io, clientLookup) {
 		else if(commandSplit[0] === 'unequip' || commandSplit[0] === 'u') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
-				if(result.name === jsonOut.name) {
+				if(result.name === nameLower) {
 					result.queue.push(parsePacket);
 				};
 			});
@@ -130,7 +131,7 @@ function parseCommand(socket, io, clientLookup) {
 		else if(commandSplit[0] === 'move' || commandSplit[0] === 'go') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
-				if(result.name === jsonOut.name) {
+				if(result.name === nameLower) {
 					result.queue.push(parsePacket);
 				};
 			});
@@ -138,7 +139,7 @@ function parseCommand(socket, io, clientLookup) {
 		else if(commandSplit[0] === 'look' || commandSplit[0] === 'l' || commandSplit[0] === 'x' || commandSplit[0] === 'ex' ||commandSplit[0] === 'examine') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
-				if(result.name === jsonOut.name) {
+				if(result.name === nameLower) {
 					console.log('parseCommand start queue: '+result.queue);
 					result.queue.push(parsePacket);
 					console.log('parseCommand end queue: '+result.queue);
