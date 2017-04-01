@@ -7,7 +7,11 @@ socket.emit('login', loginJsonString);
 
 function countdown(count) {
   console.log(count);
-  $('#timer').text(count);
+  $(document).ready(
+    function() {
+        $('#timer').html(count);
+    }
+  );   
   if(count > 0) {
     setInterval(countdown(count - 1), 1000);
   };
