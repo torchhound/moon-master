@@ -154,35 +154,22 @@ function parseCommand(socket, io, clientLookup) {
 
 function gameLoop() {
 	var seconds = Math.round(new Date().getTime() / 1000); 
-	//console.log('seconds: '+seconds);
 	clientLookup.forEach(function(result, index) {	
-		//console.log('result.timer: '+result.timer);
 		if(result.queue[0] === undefined) {
 			//pass
 		}
-		else if(result.queue.length === 1) {
-			console.log('gameLoop start queue: '+result.queue);
-			var check = cli.parse(result.queue[0], clientLookup, players, mapJson, result.socketId, io);
-			io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":"queue length 1 test"}));
-			if(check == false) {
-				result.timer = 0; 
-				console.log('gameLoop check false');
-			};
-			result.queue.splice(0, 1);
-			console.log('gameLoop end queue: '+result.queue);
-		}
 		else if(result.timer < seconds) {
+			//console.log('gameLoop start queue: '+result.queue);
 			var check = cli.parse(result.queue[0], clientLookup, players, mapJson, result.socketId, io);
-			io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":"queue result.timer < seconds test"}));
 			for(var x in result.queue) {
 				console.log(result.queue[x].json.command);
-				io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":result.queue[x].json.command})); //TODO(torchhound) This never emits
+				io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":result.queue[x].json.command})); 
 			};
 			if(check == false) {
 				result.timer = 0; 
-				console.log('gameLoop check false');
 			};
 			result.queue.splice(0, 1);
+			//console.log('gameLoop end queue: '+result.queue);
 		}; 
 	});
 	setImmediate(gameLoop);

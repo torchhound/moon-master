@@ -204,7 +204,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 							clientLookup.forEach(function(result, index) {
 								if(result.name === jsonOut.name) {
 									var seconds = Math.round(new Date().getTime() / 1000); 
-									var time = seconds + 10; //Value changed for testing
+									var time = seconds + 1; 
 									result.timer = time; 
 									console.log('result.timer: '+(result.timer - seconds)); 
 									io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
