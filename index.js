@@ -139,7 +139,9 @@ function parseCommand(socket, io, clientLookup) {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
+					console.log('parseCommand start queue: '+result.queue);
 					result.queue.push(parsePacket);
+					console.log('parseCommand end queue: '+result.queue);
 				};
 			});
 		}
@@ -151,20 +153,23 @@ function parseCommand(socket, io, clientLookup) {
 };
 
 function gameLoop() {
+	var seconds = Math.round(new Date().getTime() / 1000); 
+	//console.log('seconds: '+seconds);
 	clientLookup.forEach(function(result, index) {	
-		var seconds = new Date() / 1000; 
-		seconds = Math.round(seconds);
+		//console.log('result.timer: '+result.timer);
 		if(result.queue[0] === undefined) {
 			//pass
 		}
 		else if(result.queue.length === 1) {
+			console.log('gameLoop start queue: '+result.queue);
 			var check = cli.parse(result.queue[0], clientLookup, players, mapJson, result.socketId, io);
 			io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":"queue length 1 test"}));
 			if(check == false) {
 				result.timer = 0; 
 				console.log('gameLoop check false');
 			};
-			result.queue.splice(index, 1);
+			result.queue.splice(0, 1);
+			console.log('gameLoop end queue: '+result.queue);
 		}
 		else if(result.timer < seconds) {
 			var check = cli.parse(result.queue[0], clientLookup, players, mapJson, result.socketId, io);
@@ -177,7 +182,7 @@ function gameLoop() {
 				result.timer = 0; 
 				console.log('gameLoop check false');
 			};
-			result.queue.splice(index, 1);
+			result.queue.splice(0, 1);
 		}; 
 	});
 	setImmediate(gameLoop);

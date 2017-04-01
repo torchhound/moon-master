@@ -16,8 +16,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 		io.emit('chat', msg);	
 		clientLookup.forEach(function(result, index) {
 			if(result.name === jsonOut.name) {
-				var seconds = new Date() / 1000; 
-				seconds = Math.round(seconds);
+				var seconds = Math.round(new Date().getTime() / 1000); 
 				var time = seconds + 0;
 				result.timer = time; 
 				console.log('result.timer: '+(result.timer - seconds)); 
@@ -42,8 +41,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 		});
 		clientLookup.forEach(function(result, index) {
 			if(result.name === jsonOut.name) {
-				var seconds = new Date() / 1000; 
-				seconds = Math.round(seconds);
+				var seconds = Math.round(new Date().getTime() / 1000); 
 				var time = seconds + 0;
 				result.timer = time; 
 				console.log('result.timer: '+(result.timer - seconds)); 
@@ -56,8 +54,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			io.of('/').to(socketId).emit('combat', JSON.stringify({"queue":"No queued action", "log":"Intentionally left blank"}));
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
-					var seconds = new Date() / 1000; 
-					seconds = Math.round(seconds);
+					var seconds = Math.round(new Date().getTime() / 1000); 
 					var time = seconds + 0;
 					result.timer = time; 
 					console.log('result.timer: '+(result.timer - seconds)); 
@@ -79,8 +76,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			if(check == true) {
 				clientLookup.forEach(function(result, index) {
 					if(result.name === jsonOut.name) {
-						var seconds = new Date() / 1000; 
-						seconds = Math.round(seconds);
+						var seconds = Math.round(new Date().getTime() / 1000); 
 						var time = seconds + 1;
 						result.timer = time; 
 						console.log('result.timer: '+(result.timer - seconds)); 
@@ -103,8 +99,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			if(check == true) {
 				clientLookup.forEach(function(result, index) {
 					if(result.name === jsonOut.name) {
-						var seconds = new Date() / 1000; 
-						seconds = Math.round(seconds);
+						var seconds = Math.round(new Date().getTime() / 1000); 
 						var time = seconds + 1;
 						result.timer = time; 
 						console.log('result.timer: '+(result.timer - seconds)); 
@@ -127,8 +122,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			if(check == true) {
 				clientLookup.forEach(function(result, index) {
 					if(result.name === jsonOut.name) {
-						var seconds = new Date() / 1000; 
-						seconds = Math.round(seconds);
+						var seconds = Math.round(new Date().getTime() / 1000); 
 						var time = seconds + 1;
 						result.timer = time; 
 						console.log('result.timer: '+(result.timer - seconds)); 
@@ -151,8 +145,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			if(check == true) {
 				clientLookup.forEach(function(result, index) {
 					if(result.name === jsonOut.name) {
-						var seconds = new Date() / 1000; 
-						seconds = Math.round(seconds);
+						var seconds = Math.round(new Date().getTime() / 1000); 
 						var time = seconds + 1;
 						result.timer = time; 
 						console.log('result.timer: '+(result.timer - seconds)); 
@@ -176,8 +169,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			if(check == true) {
 				clientLookup.forEach(function(result, index) {
 					if(result.name === jsonOut.name) {
-						var seconds = new Date() / 1000; 
-						seconds = Math.round(seconds);
+						var seconds = Math.round(new Date().getTime() / 1000); 
 						var time = seconds + 3;
 						result.timer = time; 
 						console.log('result.timer: '+(result.timer - seconds)); 
@@ -211,9 +203,8 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 							foundTarget = true;
 							clientLookup.forEach(function(result, index) {
 								if(result.name === jsonOut.name) {
-									var seconds = new Date() / 1000; 
-									seconds = Math.round(seconds);
-									var time = seconds + 1;
+									var seconds = Math.round(new Date().getTime() / 1000); 
+									var time = seconds + 10; //Value changed for testing
 									result.timer = time; 
 									console.log('result.timer: '+(result.timer - seconds)); 
 									io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
@@ -260,8 +251,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 					};
 					clientLookup.forEach(function(result, index) {
 						if(result.name === jsonOut.name) {
-							var seconds = new Date() / 1000; 
-							seconds = Math.round(seconds);
+							var seconds = Math.round(new Date().getTime() / 1000); 
 							var time = seconds + 1;
 							result.timer = time; 
 							console.log('result.timer: '+(result.timer - seconds)); 
@@ -276,8 +266,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 					io.of('/').to(socketId).emit('log', msg);
 					clientLookup.forEach(function(result, index) {
 						if(result.name === jsonOut.name) {
-							var seconds = new Date() / 1000; 
-							seconds = Math.round(seconds);
+							var seconds = Math.round(new Date().getTime() / 1000); 
 							var time = seconds + 1;
 							result.timer = time; 
 							console.log('result.timer: '+(result.timer - seconds)); 
@@ -306,8 +295,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 					};	
 					clientLookup.forEach(function(result, index) {
 						if(result.name === jsonOut.name) {
-							var seconds = new Date() / 1000; 
-							seconds = Math.round(seconds);
+							var seconds = Math.round(new Date().getTime() / 1000); 
 							var time = seconds + 1;
 							result.timer = time; 
 							console.log('result.timer: '+(result.timer - seconds)); 
@@ -331,8 +319,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						foundTarget = true;
 						clientLookup.forEach(function(result, index) {
 							if(result.name === jsonOut.name) {
-								var seconds = new Date() / 1000; 
-								seconds = Math.round(seconds);
+								var seconds = Math.round(new Date().getTime() / 1000); 
 								var time = seconds + 1;
 								result.timer = time; 
 								console.log('result.timer: '+(result.timer - seconds)); 
@@ -353,8 +340,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 									foundTarget = true;
 									clientLookup.forEach(function(result, index) {
 										if(result.name === jsonOut.name) {
-											var seconds = new Date() / 1000; 
-											seconds = Math.round(seconds);
+											var seconds = Math.round(new Date().getTime() / 1000); 
 											var time = seconds + 1;
 											result.timer = time; 
 											console.log('result.timer: '+(result.timer - seconds)); 
@@ -376,8 +362,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 							foundTarget = true;
 							clientLookup.forEach(function(result, index) {
 								if(result.name === jsonOut.name) {
-									var seconds = new Date() / 1000; 
-									seconds = Math.round(seconds);
+									var seconds = Math.round(new Date().getTime() / 1000); 
 									var time = seconds + 1;
 									result.timer = time; 
 									console.log('result.timer: '+(result.timer - seconds)); 

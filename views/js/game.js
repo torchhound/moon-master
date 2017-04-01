@@ -7,11 +7,11 @@ socket.emit('login', loginJsonString);
 
 function countdown(count) {
   console.log(count);
-  $(document).ready(
-    function() {
-        $('#timer').html(count);
-    }
-  );   
+  /*$(document).ready(
+    function() {*/
+        $('#timer').text(count); //TODO(torchhound) does not visually countdown
+    /*}
+  );  */ 
   if(count > 0) {
     setInterval(countdown(count - 1), 1000);
   };
@@ -55,7 +55,7 @@ socket.on('combat', function(msg) {
 socket.on('queue', function(msg) {
   var jsonOut = JSON.parse(msg);
   var queue = jsonOut.queue;
-  $('#queue').text($('<li>').text(queue + '\n')); //TODO(torchhound) displays [object Object]
+  $('#queue').text(queue + '\n'); 
   document.getElementById('queue').scrollIntoView(false);
 });
 
