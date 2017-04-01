@@ -6,8 +6,11 @@ var loginJsonString= JSON.stringify(loginObj);
 socket.emit('login', loginJsonString);
 
 function countdown(count) {
-  $('#timer').val(count);
-  setInterval(countdown(count--), 1000);
+  console.log(count);
+  $('#timer').text(count);
+  if(count > 0) {
+    setInterval(countdown(count - 1), 1000);
+  };
 };
 
 $("#submit").click(function() {
@@ -48,8 +51,12 @@ socket.on('combat', function(msg) {
 socket.on('queue', function(msg) {
   var jsonOut = JSON.parse(msg);
   var queue = jsonOut.queue;
-  var timer = jsonOut.timer;
-  $('#queue').append($('<li>').text(queue + '\n')); 
-  countdown(timer);
+  $('#queue').text($('<li>').text(queue + '\n')); //TODO(torchhound) displays [object Object]
   document.getElementById('queue').scrollIntoView(false);
+});
+
+socket.on('timer', function(msg) {
+  var jsonOut = JSON.parse(msg);
+  var timer = jsonOut.timer;
+  countdown(timer);
 });

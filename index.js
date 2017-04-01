@@ -76,22 +76,14 @@ function parseCommand(socket, io, clientLookup) {
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
-					var seconds = new Date() / 1000; 
-					seconds = Math.round(seconds);
-					var time = seconds + 0;
-					result.timer = time;
-				};
-			});
+				}; 
+			}); 
 		}
 		else if(commandSplit[0] === 'grind') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
-					var seconds = new Date() / 1000; 
-					seconds = Math.round(seconds);
-					var time = seconds + 0;
-					result.timer = time;
 				};
 			});
 		}
@@ -100,10 +92,6 @@ function parseCommand(socket, io, clientLookup) {
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
-					var seconds = new Date() / 1000; 
-					seconds = Math.round(seconds);
-					var time = seconds + 0;
-					result.timer = time;
 				};
 			});
 		}
@@ -112,10 +100,6 @@ function parseCommand(socket, io, clientLookup) {
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
-					var seconds = new Date() / 1000; 
-					seconds = Math.round(seconds);
-					var time = seconds + 1;
-					result.timer = time;
 				};
 			});
 		}
@@ -124,10 +108,6 @@ function parseCommand(socket, io, clientLookup) {
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
-					var seconds = new Date() / 1000; 
-					seconds = Math.round(seconds);
-					var time = seconds + 1;
-					result.timer = time;
 				};
 			});
 		}
@@ -136,10 +116,6 @@ function parseCommand(socket, io, clientLookup) {
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
-					var seconds = new Date() / 1000; 
-					seconds = Math.round(seconds);
-					var time = seconds + 1;
-					result.timer = time;
 				};
 			});
 		}
@@ -148,10 +124,6 @@ function parseCommand(socket, io, clientLookup) {
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
-					var seconds = new Date() / 1000; 
-					seconds = Math.round(seconds);
-					var time = seconds + 1;
-					result.timer = time;
 				};
 			});
 		}
@@ -160,10 +132,6 @@ function parseCommand(socket, io, clientLookup) {
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
-					var seconds = new Date() / 1000; 
-					seconds = Math.round(seconds);
-					var time = seconds + 3;
-					result.timer = time;
 				};
 			});
 		}
@@ -172,10 +140,6 @@ function parseCommand(socket, io, clientLookup) {
 			clientLookup.forEach(function(result, index) {
 				if(result.name === jsonOut.name) {
 					result.queue.push(parsePacket);
-					var seconds = new Date() / 1000; 
-					seconds = Math.round(seconds);
-					var time = seconds + 1;
-					result.timer = time;
 				};
 			});
 		}
@@ -195,21 +159,22 @@ function gameLoop() {
 		}
 		else if(result.queue.length === 1) {
 			var check = cli.parse(result.queue[0], clientLookup, players, mapJson, result.socketId, io);
+			io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":"queue length 1 test"}));
 			if(check == false) {
-				result.timer = 0; //TODO(torchhound) seconds or 0?
+				result.timer = 0; 
 				console.log('gameLoop check false');
 			};
 			result.queue.splice(index, 1);
 		}
 		else if(result.timer < seconds) {
 			var check = cli.parse(result.queue[0], clientLookup, players, mapJson, result.socketId, io);
-			io.of('/').to(result.socketId).emit('queue', JSON.stringify({"timer":result.timer})); //TODO(torchhound) these emits do not work
+			io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":"queue result.timer < seconds test"}));
 			for(var x in result.queue) {
 				console.log(result.queue[x].json.command);
-				io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":result.queue[x].json.command}));
+				io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":result.queue[x].json.command})); //TODO(torchhound) This never emits
 			};
 			if(check == false) {
-				result.timer = 0; //TODO(torchhound) seconds or 0?
+				result.timer = 0; 
 				console.log('gameLoop check false');
 			};
 			result.queue.splice(index, 1);

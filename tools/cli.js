@@ -14,6 +14,16 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 	if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
 		msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
 		io.emit('chat', msg);	
+		clientLookup.forEach(function(result, index) {
+			if(result.name === jsonOut.name) {
+				var seconds = new Date() / 1000; 
+				seconds = Math.round(seconds);
+				var time = seconds + 0;
+				result.timer = time; 
+				console.log('result.timer: '+(result.timer - seconds)); 
+				io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+			};
+		});
 		return true;
 	}
 	//Grind is a temporary skill but this can be used as the base for most self-only skills.
@@ -30,10 +40,30 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 				return true;
 			};
 		});
+		clientLookup.forEach(function(result, index) {
+			if(result.name === jsonOut.name) {
+				var seconds = new Date() / 1000; 
+				seconds = Math.round(seconds);
+				var time = seconds + 0;
+				result.timer = time; 
+				console.log('result.timer: '+(result.timer - seconds)); 
+				io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+			};
+		});
 	}
 	else if(commandSplit[0] === 'combat') {
 		if(commandSplit[1] == null){
 			io.of('/').to(socketId).emit('combat', JSON.stringify({"queue":"No queued action", "log":"Intentionally left blank"}));
+			clientLookup.forEach(function(result, index) {
+				if(result.name === jsonOut.name) {
+					var seconds = new Date() / 1000; 
+					seconds = Math.round(seconds);
+					var time = seconds + 0;
+					result.timer = time; 
+					console.log('result.timer: '+(result.timer - seconds)); 
+					io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+				};
+			});
 			return true;
 		} else {
 			io.of('/').to(socketId).emit('combat', JSON.stringify({"queue":commandSplit[1], "log":"Intentionally left blank"}));
@@ -46,6 +76,18 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			return false;
 		} else if(commandSplit[1] != null) {
 			var check = itemTools.pickup(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			if(check == true) {
+				clientLookup.forEach(function(result, index) {
+					if(result.name === jsonOut.name) {
+						var seconds = new Date() / 1000; 
+						seconds = Math.round(seconds);
+						var time = seconds + 1;
+						result.timer = time; 
+						console.log('result.timer: '+(result.timer - seconds)); 
+						io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+					};
+				});
+			};
 			return check;
 		} else {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
@@ -58,6 +100,18 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			return false;
 		} else if(commandSplit[1] != null) { 
 			var check = itemTools.drop(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			if(check == true) {
+				clientLookup.forEach(function(result, index) {
+					if(result.name === jsonOut.name) {
+						var seconds = new Date() / 1000; 
+						seconds = Math.round(seconds);
+						var time = seconds + 1;
+						result.timer = time; 
+						console.log('result.timer: '+(result.timer - seconds)); 
+						io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+					};
+				});
+			};
 			return check;
 		} else {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
@@ -70,6 +124,18 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			return false;
 		} else if(commandSplit[1] != null) { 
 			var check = itemTools.equip(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			if(check == true) {
+				clientLookup.forEach(function(result, index) {
+					if(result.name === jsonOut.name) {
+						var seconds = new Date() / 1000; 
+						seconds = Math.round(seconds);
+						var time = seconds + 1;
+						result.timer = time; 
+						console.log('result.timer: '+(result.timer - seconds)); 
+						io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+					};
+				});
+			};
 			return check;
 		} else {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to equip"}));
@@ -82,6 +148,18 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			return false;
 		} else if(commandSplit[1] != null) { 
 			var check = itemTools.unequip(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			if(check == true) {
+				clientLookup.forEach(function(result, index) {
+					if(result.name === jsonOut.name) {
+						var seconds = new Date() / 1000; 
+						seconds = Math.round(seconds);
+						var time = seconds + 1;
+						result.timer = time; 
+						console.log('result.timer: '+(result.timer - seconds)); 
+						io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+					};
+				});
+			};
 			return check;
 		} else {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to unequip"}));
@@ -95,6 +173,18 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			return false;
 		} else if(commandSplit[1] != null) { 
 			var check = playerTools.move(commandSplit[1], players, jsonOut, socketId, clientLookup, io, map);
+			if(check == true) {
+				clientLookup.forEach(function(result, index) {
+					if(result.name === jsonOut.name) {
+						var seconds = new Date() / 1000; 
+						seconds = Math.round(seconds);
+						var time = seconds + 3;
+						result.timer = time; 
+						console.log('result.timer: '+(result.timer - seconds)); 
+						io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+					};
+				});
+			};
 			return check;
 		} else {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to move to"}));
@@ -119,6 +209,16 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 							msg = JSON.stringify({"command":"examine: "+roomOut.name+"; Players: "+roomOut.players+"; Contents: "+roomOut.inventory});
 							io.of('/').to(socketId).emit('log', msg);
 							foundTarget = true;
+							clientLookup.forEach(function(result, index) {
+								if(result.name === jsonOut.name) {
+									var seconds = new Date() / 1000; 
+									seconds = Math.round(seconds);
+									var time = seconds + 1;
+									result.timer = time; 
+									console.log('result.timer: '+(result.timer - seconds)); 
+									io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+								};
+							});
 							return true;
 						};
 					};
@@ -158,12 +258,32 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						msg = JSON.stringify({"command":target.limbs[i].type+" "+target.limbs[i].name+" (Health: "+target.limbs[i].health/target.limbs[i].quality*100+"\%) ("+target.limbs[i].health+"/"+target.limbs[i].quality+") (Quality: "+target.limbs[i].quality/target.limbs[i].qualityStandard*100+"\%)"});
 						io.of('/').to(socketId).emit('log', msg);
 					};
+					clientLookup.forEach(function(result, index) {
+						if(result.name === jsonOut.name) {
+							var seconds = new Date() / 1000; 
+							seconds = Math.round(seconds);
+							var time = seconds + 1;
+							result.timer = time; 
+							console.log('result.timer: '+(result.timer - seconds)); 
+							io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+						};
+					});
 					return true;
 				}
 				else if (limbNumber != -1) {
 					//Player wants to know about a specific limb
 					msg = JSON.stringify({"command":target.limbs[limbNumber].type+" "+target.limbs[limbNumber].name+" (Health: "+target.limbs[limbNumber].health/target.limbs[limbNumber].quality*100+"\%) ("+target.limbs[limbNumber].health+"/"+target.limbs[limbNumber].quality+") (Quality: "+target.limbs[limbNumber].quality/target.limbs[limbNumber].qualityStandard*100+"\%)"});
 					io.of('/').to(socketId).emit('log', msg);
+					clientLookup.forEach(function(result, index) {
+						if(result.name === jsonOut.name) {
+							var seconds = new Date() / 1000; 
+							seconds = Math.round(seconds);
+							var time = seconds + 1;
+							result.timer = time; 
+							console.log('result.timer: '+(result.timer - seconds)); 
+							io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+						};
+					});
 					return true;
 				} else {
 					//If none of the above options are true then the player just wants to know general info on the target.
@@ -184,6 +304,16 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						msg = JSON.stringify({"command":target.skills[i].name+": Rank "+target.skills[i].rank+" (EXP: "+target.skills[i].exp+"/"+playerTools.expNeeded(target.skills[i].rank)+")"});
 						io.of('/').to(socketId).emit('log', msg);
 					};	
+					clientLookup.forEach(function(result, index) {
+						if(result.name === jsonOut.name) {
+							var seconds = new Date() / 1000; 
+							seconds = Math.round(seconds);
+							var time = seconds + 1;
+							result.timer = time; 
+							console.log('result.timer: '+(result.timer - seconds)); 
+							io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+						};
+					});
 					return true;	
 				};
 			};
@@ -199,6 +329,16 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						console.log(inventoryOut);
 						io.of('/').to(socketId).emit('log', JSON.stringify({"command":inventoryOut.name})); //TODO(torchhound) add more item attributes
 						foundTarget = true;
+						clientLookup.forEach(function(result, index) {
+							if(result.name === jsonOut.name) {
+								var seconds = new Date() / 1000; 
+								seconds = Math.round(seconds);
+								var time = seconds + 1;
+								result.timer = time; 
+								console.log('result.timer: '+(result.timer - seconds)); 
+								io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+							};
+						});
 						return true;
 					};
 				});
@@ -211,6 +351,16 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 								if(equipmentOut.name === commandSplit[1]) {
 									io.of('/').to(socketId).emit('log', JSON.stringify({"command":equipmentOut.name}));
 									foundTarget = true;
+									clientLookup.forEach(function(result, index) {
+										if(result.name === jsonOut.name) {
+											var seconds = new Date() / 1000; 
+											seconds = Math.round(seconds);
+											var time = seconds + 1;
+											result.timer = time; 
+											console.log('result.timer: '+(result.timer - seconds)); 
+											io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+										};
+									});
 									return true;
 								};
 							};
@@ -224,6 +374,16 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 							console.log(inventoryOut);
 							io.of('/').to(socketId).emit('log', JSON.stringify({"command":inventoryOut.name})); //TODO(torchhound) add more item attributes
 							foundTarget = true;
+							clientLookup.forEach(function(result, index) {
+								if(result.name === jsonOut.name) {
+									var seconds = new Date() / 1000; 
+									seconds = Math.round(seconds);
+									var time = seconds + 1;
+									result.timer = time; 
+									console.log('result.timer: '+(result.timer - seconds)); 
+									io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+								};
+							});
 							return true;
 						};
 					});
