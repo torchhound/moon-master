@@ -10,8 +10,34 @@ var exports = module.exports = {};
 exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 	var jsonOut = packet.json;
 	var commandSplit = packet.commandSplit;
+	//GM commands; to disable cheating, simply set 'true' to 'false'
+	if (commandSplit[0] == "gm" && true) {
+		//To use modhp, type "gm hp [playername] [hpvalue] [limb]"
+		//the hpvalue can be positive or negative. It will add or subtract that much HP, but stay within the maximum and minimum.
+		//[limb] can also be 'all', in which case all limbs will be modified.
+		if (commandSplit[1] == "hp") {
+			players.forEach(function(result, index) {
+			var target = JSON.parse(result);
+				if (commandSplit[2] == target.name.toLowerCase()) {
+					if (commandSplit[4] == "all") {
+						for (var i = 0; i < target.limbs.length; i++) {
+							playerTools.setLimbHealth(target, i, commandSplit[3]);
+						};
+					}
+					else {
+						var limbInput = []
+						limbInput[0] = commandSplit[4];
+						limbInput[1] = commandSplit[5];
+						var limbNumber = playerTools.getLimbFromInput(target, limbInput);
+						playerTools.setLimbHealth(target, limbNumber, commandSplit[3]);
+					};
+					players[index] = JSON.stringify(target);
+				};
+			});
+		};
+	}
 	//If command is 't' or 'say' then 'Local Chat'
-	if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
+	 else if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
 		msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
 		io.emit('chat', msg);	
 		clientLookup.forEach(function(result, index) {
@@ -25,16 +51,60 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 		});
 		return true;
 	}
+	//Standard Attack function
+	else if(commandSplit[0] == 'a') {
+		if(commandSplit[1] == null) {
+			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You must specify what you want to attack!"}));
+			return false
+		} else {
+			var playerPos = [-1, -1];
+			var targetPos = [-2, -2];
+			var player;
+			var target;
+			var playerIndex;
+			var targetIndex;
+			//Get the position of the player and the player's target
+			players.forEach(function(result, index) {
+				var playerOut = JSON.parse(result);
+				if(jsonOut.name.toLowerCase() === playerOut.name) {
+					playerPos = playerOut.position;
+					player = playerOut;
+					playerIndex = index;
+				};
+				if (commandSplit[1] === playerOut.name) {
+					targetPos = playerOut.position;
+					target = playerOut;
+					targetIndex = index;
+				};
+			});					
+			//If positions are the same, output info on target
+			if (playerPos[0] == targetPos[0] && playerPos[1] == targetPos[1]) {
+				//Determine what type of weapon player is using. (For now, it is just 'unarmed')
+				//Roll skill to see if player hits or misses the target
+				//Determine what body part is hit
+				var limbHit = playerTools.getLimbRand(target, player.stances[0]);
+				//Apply damage
+				msg = JSON.stringify({"command":"wowee u sure attacked them"}); //TODO(torchhound) add timer
+				io.of('/').to(socketId).emit('log', msg);
+				return true;
+			}
+			else {
+				msg = JSON.stringify({"command":"There is no such thing to attack!"});
+				io.of('/').to(socketId).emit('log', msg);
+				return false;
+			};
+		};
+	}
 	//Grind is a temporary skill but this can be used as the base for most self-only skills.
 	else if(commandSplit[0] === 'grind') {
 		players.forEach(function(result, index) {
 			var playerOut = JSON.parse(result);
 			if (jsonOut.name.toLowerCase() === playerOut.name.toLowerCase()) {
-				msg = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
-				//Success Condition
-				if (msg == "") msg = "Success!";
-				//Fail Condition
-				else players[index] = JSON.stringify(playerOut);
+				skillOut = playerTools.skillCheck(playerOut, 0, 50, 10, 100);
+				msg = skillOut.text;
+				//If EXP has changed, update player
+				if (skillOut.success == false) players[index] = JSON.stringify(playerOut);
+				socket.emit('log', JSON.stringify({"command":msg}));
 				io.of('/').to(socketId).emit('log', JSON.stringify({"command":msg}));
 				return true;
 			};
@@ -237,16 +307,19 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			if (playerPos[0] == targetPos[0] && playerPos[1] == targetPos[1]) {
 				foundTarget = true;
 				//Check if the player is asking about a specific limb.
-				var limbNumber = playerTools.getLimbFromInput(target, commandSplit);
+				var limbInput = []
+				limbInput[0] = commandSplit[2];
+				limbInput[1] = commandSplit[3];
+				var limbNumber = playerTools.getLimbFromInput(target, limbInput);
 				msg = JSON.stringify({"command":"Name: "+target.namePrint});
 				io.of('/').to(socketId).emit('log', msg);
 				//Check if the player is asking about the health of the target.
 				if (commandSplit[2] == "limbs" || commandSplit[2] == "limbs" || commandSplit[2] == "health" || commandSplit[2] == "hp") {
 					//Print total health, then limb health.
-					msg = JSON.stringify({"command":"General Health: "+playerTools.healthTotal(target)/playerTools.healthTotalMax(target)*100+"\% ("+playerTools.healthTotal(target)+"/"+playerTools.healthTotalMax(target)+")"});
+					msg = JSON.stringify({"command":"General Health: "+(playerTools.healthTotal(target)/playerTools.healthTotalMax(target)*100).toFixed()+"\% ("+playerTools.healthTotal(target)+"/"+playerTools.healthTotalMax(target)+")"});
 					io.of('/').to(socketId).emit('log', msg);
 					for (var i = 0; i < target.limbs.length; i++) {
-						msg = JSON.stringify({"command":target.limbs[i].type+" "+target.limbs[i].name+" (Health: "+target.limbs[i].health/target.limbs[i].quality*100+"\%) ("+target.limbs[i].health+"/"+target.limbs[i].quality+") (Quality: "+target.limbs[i].quality/target.limbs[i].qualityStandard*100+"\%)"});
+						msg = JSON.stringify({"command":playerTools.printLimbStatus(target, i)});
 						io.of('/').to(socketId).emit('log', msg);
 					};
 					clientLookup.forEach(function(result, index) {
@@ -262,7 +335,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 				}
 				else if (limbNumber != -1) {
 					//Player wants to know about a specific limb
-					msg = JSON.stringify({"command":target.limbs[limbNumber].type+" "+target.limbs[limbNumber].name+" (Health: "+target.limbs[limbNumber].health/target.limbs[limbNumber].quality*100+"\%) ("+target.limbs[limbNumber].health+"/"+target.limbs[limbNumber].quality+") (Quality: "+target.limbs[limbNumber].quality/target.limbs[limbNumber].qualityStandard*100+"\%)"});
+					msg = JSON.stringify({"command":playerTools.printLimbStatus(target, limbNumber)});
 					io.of('/').to(socketId).emit('log', msg);
 					clientLookup.forEach(function(result, index) {
 						if(result.name === jsonOut.name.toLowerCase()) {
@@ -277,14 +350,24 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 				} else {
 					//If none of the above options are true then the player just wants to know general info on the target.
 					//Print total health
-					msg = JSON.stringify({"command":"General Health: "+playerTools.healthTotal(target)/playerTools.healthTotalMax(target)*100+"\% ("+playerTools.healthTotal(target)+"/"+playerTools.healthTotalMax(target)+")"});
+					msg = JSON.stringify({"command":"General Health: "+(playerTools.healthTotal(target)/playerTools.healthTotalMax(target)*100).toFixed()+"\% ("+playerTools.healthTotal(target)+"/"+playerTools.healthTotalMax(target)+")"});
 					io.of('/').to(socketId).emit('log', msg);
-					//Print limb health (in this case, for general overview, ONLY print a limb if a limb is injured)
+					//Print limb health (in this case, for general overview, ONLY print a limb if a limb is injured. Don't display more than 5 to avoid chat spam.)
+					var numInjured = 0;
 					for (var i = 0; i < target.limbs.length; i++) {
-						if (target.limbs[i].health < target.limbs[i].quality) {
-							msg = JSON.stringify({"command":target.limbs[i].type+" "+target.limbs[i].name+" (Health: "+target.limbs[i].health/target.limbs[i].quality*100+"\%) ("+target.limbs[i].health+"/"+target.limbs[i].quality+") (Quality: "+target.limbs[i].quality/target.limbs[i].qualityStandard*100+"\%)"});
-							io.of('/').to(socketId).emit('log', msg);
+						if (target.limbs[i].health < target.limbs[i].quality || target.limbs[i].quality == 0) {
+							numInjured++;
+							if (numInjured <= 5) {
+								msg = JSON.stringify({"command":playerTools.printLimbStatus(target, i)});
+								io.of('/').to(socketId).emit('log', msg);
+							};	
 						};
+					};
+					if (numInjured > 5) {
+						msg = JSON.stringify({"command":"+"+(numInjured-5)+" more injured limbs."});
+						io.of('/').to(socketId).emit('log', msg);
+						msg = JSON.stringify({"command":"(Use \"look [name] hp\" to see all limbs)."});
+						io.of('/').to(socketId).emit('log', msg);
 					};
 					msg = JSON.stringify({"command":"Equipment: "+target.equipment});
 					io.of('/').to(socketId).emit('log', msg);
