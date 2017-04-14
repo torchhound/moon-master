@@ -10,12 +10,15 @@ const HEALTH_TO_LIVE = 2;
 //Takes in a skill, the base chance the check will succeed, the chance increase (in percentile points) per rank in the skill, and the exp awarded for trying and failing. 
 //returns "" on a success, or information about the failure if you failed.
 exports.skillCheck = function(player, skill, successBase, successSkillMod, exp) {
-	roll = Math.floor((Math.random() * 100) + 1)-(player.skills[skill].rank*successSkillMod);
+	var roll = Math.floor((Math.random() * 100) + 1)-(player.skills[skill].rank*successSkillMod);
+	returnPacket = {text:"", success:false};
 	if (roll <= successBase) {
-		return "";
+		returnPacket.text = "Success!";
+		returnPacket.success = true;
 	} else {
-		return "Failure! (" + exports.skillIncrease(player, skill, exp) + ")"; 
+		returnPacket.text = "Failure! (" + exports.skillIncrease(player, skill, exp) + ")"; 
 	};
+	return returnPacket;
 };
 	
 //Takes in a skill, adds exp to it, checks for rank increase(s), returns a string with information if you want to show it to the player.
@@ -38,47 +41,102 @@ exports.expNeeded = function(rank) {
 	return Math.round(Math.pow(rank, 1.1) * 100)
 };
 
+//Set the limb health to a new value. If above max, set to max. If zero or lower, set quality to zero. Returns new health value.
+exports.setLimbHealth = function(player, limbNum, adjustment) {
+	console.log("before: "+player.limbs[limbNum].health);
+	player.limbs[limbNum].health += Number(adjustment);
+	console.log("mid: "+player.limbs[limbNum].health);
+	if (player.limbs[limbNum].health > player.limbs[limbNum].quality) player.limbs[limbNum].health = player.limbs[limbNum].quality;
+	if (player.limbs[limbNum].health <= 0) {
+		player.limbs[limbNum].health = 0;
+		player.limbs[limbNum].quality = 0;
+	};
+	console.log("after: "+player.limbs[limbNum].health);
+	return player.limbs[limbNum].health;
+};
+
+//Pick a random body part for the purpose of targeting 
+//Uses a different table for different stances.
+exports.getLimbRand = function(player, stance) {
+	var output = -1;
+	if (stance == 0) {
+		var odds = [20, 2, 3, 5, 10, 2, 2, 13, 13, 13, 13, 1, 1, 1, 1];
+	};
+	//Check that all limbs are not destroyed
+	var anyLimb = false;
+	for (var i = 0; i < player.limbs.length; i++) {
+		if (player.limbs[i].health > 0) anyLimb = true;
+	};
+	if (anyLimb = false) {
+		console.log("WARNING: PLAYER "+player.namePrint+" WAS TARGETED FOR AN ATTACK BUT HAS NO LIMBS");
+		return 0;
+	};
+	while (output < 0) {
+		var roll = Math.floor((Math.random() * 100) + 1);
+		var limbChoice = 0;
+		while (roll > odds[limbChoice]) {
+			roll -= odds[limbChoice];
+			limbChoice++;
+		};
+		if (player.limbs[limbChoice].health > 0) { 
+			output = limbChoice;
+			console.log(roll);
+			console.log(player.limbs[output].name)
+		};
+	};
+	return output;
+};
+
 //Pick out a limb from the player, based on text input the player gives.
 exports.getLimbFromInput = function(player, input) {
-	if (input[2] == "body" || input[2] == "chest") input[2] = "torso"
-	else if (input[2] == "lung") input[2] = "lungs"
-	else if (input[2] == "skull" || input[2] == "face") input[2] = "head"
-	else if (input[2] == "arml" || input[2] == "armleft") input[2] = "arm(l)"
-	else if (input[2] == "armr" || input[2] == "armright") input[2] = "arm(r)"
-	else if (input[2] == "legl" || input[2] == "legleft") input[2] = "leg(l)"
-	else if (input[2] == "legr" || input[2] == "legright") input[2] = "leg(r)"
-	else if (input[2] == "eye" || input[2] == "eyeleft") input[2] = "eye(l)"
-	else if (input[2] == "eyer" || input[2] == "eyeright") input[2] = "eye(r)"
-	else if (input[2] == "earl" || input[2] == "earleft") input[2] = "ear(l)"
-	else if (input[2] == "earr" || input[2] == "earright") input[2] = "ear(r)"
-	else if (input[2] == "left" || input[2] == "l") {
-		if (input[3] == "arm") input[2] = "arm(l)"
-		else if (input[3] == "leg") input[2] = "leg(l)"
-		else if (input[3] == "eye") input[2] = "eye(l)"
-		else if (input[3] == "ear") input[2] = "ear(l)";
+	if (input[0] == "body" || input[0] == "chest") input[0] = "torso"
+	else if (input[0] == "lung") input[0] = "lungs"
+	else if (input[0] == "skull" || input[0] == "face") input[0] = "head"
+	else if (input[0] == "arml" || input[0] == "armleft") input[0] = "arm(l)"
+	else if (input[0] == "armr" || input[0] == "armright") input[0] = "arm(r)"
+	else if (input[0] == "legl" || input[0] == "legleft") input[0] = "leg(l)"
+	else if (input[0] == "legr" || input[0] == "legright") input[0] = "leg(r)"
+	else if (input[0] == "eye" || input[0] == "eyeleft") input[0] = "eye(l)"
+	else if (input[0] == "eyer" || input[0] == "eyeright") input[0] = "eye(r)"
+	else if (input[0] == "earl" || input[0] == "earleft") input[0] = "ear(l)"
+	else if (input[0] == "earr" || input[0] == "earright") input[0] = "ear(r)"
+	else if (input[0] == "left" || input[0] == "l") {
+		if (input[1] == "arm") input[0] = "arm(l)"
+		else if (input[1] == "leg") input[0] = "leg(l)"
+		else if (input[1] == "eye") input[0] = "eye(l)"
+		else if (input[1] == "ear") input[0] = "ear(l)";
 	}
-	else if (input[2] == "right" || input[2] == "r") {
-		if (input[3] == "arm") input[2] = "arm(r)"
-		else if (input[3] == "leg") input[2] = "leg(r)"
-		else if (input[3] == "eye") input[2] = "eye(r)"
-		else if (input[3] == "ear") input[2] = "ear(r)";
+	else if (input[0] == "right" || input[0] == "r") {
+		if (input[1] == "arm") input[0] = "arm(r)"
+		else if (input[1] == "leg") input[0] = "leg(r)"
+		else if (input[1] == "eye") input[0] = "eye(r)"
+		else if (input[1] == "ear") input[0] = "ear(r)";
 	}
-	else if (input[3] == "left" || input[3] == "l") {
-		if (input[2] == "arm") input[2] = "arm(l)"
-		else if (input[2] == "leg") input[2] = "leg(l)"
-		else if (input[2] == "eye") input[2] = "eye(l)"
-		else if (input[2] == "ear") input[2] = "ear(l)";
+	else if (input[1] == "left" || input[1] == "l") {
+		if (input[0] == "arm") input[0] = "arm(l)"
+		else if (input[0] == "leg") input[0] = "leg(l)"
+		else if (input[0] == "eye") input[0] = "eye(l)"
+		else if (input[0] == "ear") input[0] = "ear(l)";
 	}
-	else if (input[3] == "right" || input[3] == "r") {
-		if (input[2] == "arm") input[2] = "arm(r)"
-		else if (input[2] == "leg") input[2] = "leg(r)"
-		else if (input[2] == "eye") input[2] = "eye(r)"
-		else if (input[2] == "ear") input[2] = "ear(r)";
+	else if (input[1] == "right" || input[1] == "r") {
+		if (input[0] == "arm") input[0] = "arm(r)"
+		else if (input[0] == "leg") input[0] = "leg(r)"
+		else if (input[0] == "eye") input[0] = "eye(r)"
+		else if (input[0] == "ear") input[0] = "ear(r)";
 	};
 	for (var i = 0; i < player.limbs.length; i++) {
-		if (player.limbs[i].name.toLowerCase() == input[2]) return i;
+		if (player.limbs[i].name.toLowerCase() == input[0]) return i;
 	};
 	return -1;
+};
+
+//Returns a string with all information about a player's limb
+exports.printLimbStatus = function(player, limbNum) {
+	var tmp = player.limbs[limbNum].type+" "+player.limbs[limbNum].name;
+	//Check if limb is destroyed or not.
+	if (player.limbs[limbNum].quality == 0) tmp += " (DESTROYED)"
+	else tmp += " (Health: "+(player.limbs[limbNum].health/player.limbs[limbNum].quality*100).toFixed()+"\% ("+player.limbs[limbNum].health+"/"+player.limbs[limbNum].quality+") (Quality: "+(player.limbs[limbNum].quality/player.limbs[limbNum].qualityStandard*100).toFixed()+"\%)"
+	return tmp;
 };
 
 //Calculate the total CURRENT health of all of the player's limbs, including weighted value.
