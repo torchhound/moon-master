@@ -36,6 +36,7 @@ module.exports = class Player {
  		this.limbs[12] = {name:"Eye(R)", weight:1, qualityStandard:5};
  		this.limbs[13] = {name:"Ear(L)", weight:1, qualityStandard:5};
  		this.limbs[14] = {name:"Ear(R)", weight:1, qualityStandard:5};
+
 		for (var i = 0; i < this.limbs.length; i++) {
 			this.limbs[i].quality = this.limbs[i].qualityStandard;
 			this.limbs[i].health = this.limbs[i].qualityStandard;

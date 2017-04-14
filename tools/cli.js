@@ -70,6 +70,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 					playerPos = playerOut.position;
 					player = playerOut;
 					playerIndex = index;
+
 				};
 				if (commandSplit[1] === playerOut.name) {
 					targetPos = playerOut.position;
