@@ -1,6 +1,6 @@
 var exports = module.exports = {};
 
-exports.drop = function(item, jsonOut, socket, players, map, clientLookup) {
+exports.drop = function(item, jsonOut, socketId, players, map, clientLookup, io) {
 	var inventory;
 	var equipment;
 	var position;
@@ -23,7 +23,7 @@ exports.drop = function(item, jsonOut, socket, players, map, clientLookup) {
 		if(inventoryOut.name === item){
 			droppedItem = inventoryOut;
 			inventory.splice(index, 1);
-			socket.emit('log', JSON.stringify({"command":"You dropped "+item+" from your inventory"}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You dropped "+item+" from your inventory"}));
 			foundItem = true;
 		};
 	});
@@ -33,10 +33,13 @@ exports.drop = function(item, jsonOut, socket, players, map, clientLookup) {
 			if(equipmentOut.name === item){
 				droppedItem = equipmentOut;
 				equipment.splice(index, 1);
-				socket.emit('log', JSON.stringify({"command":"You dropped "+item+" from your equipment"}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You dropped "+item+" from your equipment"}));
 				foundItem = true;
 			};
 		});
+	};
+	if(foundItem == false) {
+		return false;
 	};
 	var p1 = position[0], 
 		p2 = position[1];
@@ -48,14 +51,16 @@ exports.drop = function(item, jsonOut, socket, players, map, clientLookup) {
 	playerOut.equipment = equipment;
 	players[playerIndex] = JSON.stringify(playerOut);
 	console.log('drop after player inventory: '+ playerOut.inventory); 
-	console.log('drop after player equipment: '+ playerOut.equipment); 
+	console.log('drop after player equipment: '+ playerOut.equipment);
+	return true;
 };
 
-exports.pickup = function(item, jsonOut, socket, players, map, clientLookup) {
+exports.pickup = function(item, jsonOut, socketId, players, map, clientLookup, io) {
 	var inventory;
 	var position;
 	var pickupItem;
 	var playerIndex;
+	var foundItem;
 	players.forEach(function(result, index) { 
 		var playerOut = JSON.parse(result);
 		if(playerOut.name === jsonOut.name.toLowerCase()) {
@@ -73,9 +78,13 @@ exports.pickup = function(item, jsonOut, socket, players, map, clientLookup) {
 		if(inventoryOut.name === item){
 			pickupItem = inventoryOut;
 			roomOut.inventory.splice(index, 1);
-			socket.emit('log', JSON.stringify({"command":"You picked up "+item}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You picked up "+item}));
+			foundItem = true;
 		};
 	});
+	if(foundItem == false) {
+		return false;
+	};
 	map.map[p1][p2] = JSON.stringify(roomOut);
 	inventory.push(JSON.stringify(pickupItem));
 	console.log(inventory);
@@ -83,9 +92,10 @@ exports.pickup = function(item, jsonOut, socket, players, map, clientLookup) {
 	playerOut.inventory = inventory;
 	players[playerIndex] = JSON.stringify(playerOut);
 	console.log('pickup after player inventory: '+ playerOut.inventory); 
+	return true;
 };
 
-exports.equip = function(item, jsonOut, socket, players, map, clientLookup) {
+exports.equip = function(item, jsonOut, socketId, players, map, clientLookup, io) {
 	var inventory;
 	var equipment;
 	var position;
@@ -109,7 +119,7 @@ exports.equip = function(item, jsonOut, socket, players, map, clientLookup) {
 		if(inventoryOut.name === item){
 			equipItem = inventoryOut;
 			inventory.splice(index, 1);
-			socket.emit('log', JSON.stringify({"command":"You equipped "+item+" from your inventory"}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You equipped "+item+" from your inventory"}));
 			foundItem = true;
 		};
 	});
@@ -119,24 +129,29 @@ exports.equip = function(item, jsonOut, socket, players, map, clientLookup) {
 			if(inventoryOut.name === item) {
 				equipItem = inventoryOut;
 				roomOut.inventory.splice(index, 1);
-				socket.emit('log', JSON.stringify({"command":"You equipped "+item+" from the ground"}));
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You equipped "+item+" from the ground"}));
 				map.map[p1][p2] = JSON.stringify(roomOut);
 				foundItem = true;
 			};
 		});
+	};
+	if(foundItem == false) {
+		return false;
 	};
 	equipment.push(JSON.stringify(equipItem));
 	var playerOut = JSON.parse(players[playerIndex]);
 	playerOut.inventory = inventory;
 	playerOut.equipment = equipment;
 	players[playerIndex] = JSON.stringify(playerOut);
+	return true;
 };
 
-exports.unequip = function(item, jsonOut, socket, players, map, clientLookup) {
+exports.unequip = function(item, jsonOut, socketId, players, map, clientLookup, io) {
 	var inventory;
 	var equipment;
 	var unequipItem;
 	var playerIndex;
+	var foundItem = false;
 	players.forEach(function(result, index) { 
 		var playerOut = JSON.parse(result);
 		if(playerOut.name === jsonOut.name.toLowerCase()) {
@@ -152,13 +167,18 @@ exports.unequip = function(item, jsonOut, socket, players, map, clientLookup) {
 		if(equipmentOut.name === item){
 			unequipItem = equipmentOut;
 			equipment.splice(index, 1);
+			foundItem = true;
 		};
 	});
+	if(foundItem == false) {
+		return false;
+	};
 	inventory.push(JSON.stringify(unequipItem));
-	socket.emit('log', JSON.stringify({"command":"You unequipped "+item}));
+	io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You unequipped "+item}));
 	var playerOut = JSON.parse(players[playerIndex]);
 	playerOut.inventory = inventory;
 	playerOut.equipment = equipment;
 	players[playerIndex] = JSON.stringify(playerOut);
 	console.log('unequip after player equipment: '+ playerOut.equipment); 
+	return true;
 };

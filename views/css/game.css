@@ -1,15 +1,15 @@
 #cli {
-	width: 75%;
+	width: 75vh;
 }
 
 #queue-div {
-	height: 150px;
+	height: 10vh;
 	overflow-y:scroll;
 	overflow-x: hidden;
 }
 
 #environment {
-	height: 150px;
+	height: 10vh;
 }
 
 li {
@@ -17,13 +17,13 @@ li {
 }
 
 .output {
-	height: 500px;
+	height: 50vh;
 	overflow-y:scroll;
 	overflow-x: hidden;
 }
 
 .info {
-	height: 750px;
+	height: 90vh;
 	overflow-y:scroll;
 	margin-top: 50px;
 }

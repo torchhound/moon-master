@@ -1,0 +1,13 @@
+var config = {
+development: {
+    //server details
+    server: {
+        host: '127.0.0.1',
+        port: '3000'
+    }
+},
+production: {
+    
+}
+};
+module.exports = config;
