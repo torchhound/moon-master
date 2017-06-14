@@ -72,7 +72,23 @@ function parseCommand(socket, io, clientLookup) {
 		};
 		
 		//Determine what function is being called;
-		if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
+		if(commandSplit[0] == 'gm') {
+			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
+			clientLookup.forEach(function(result, index) {
+				if(result.name === nameLower) {
+					result.queue.push(parsePacket);
+				}; 
+			}); 
+		}
+		else if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
+			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
+			clientLookup.forEach(function(result, index) {
+				if(result.name === nameLower) {
+					result.queue.push(parsePacket);
+				}; 
+			}); 
+		}
+		else if(commandSplit[0] == 'a' || commandSplit[0] == 'attack' || commandSplit[0] == 'hit' || commandSplit[0] == 'punch') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === nameLower) {
@@ -81,14 +97,6 @@ function parseCommand(socket, io, clientLookup) {
 			}); 
 		}
 		else if(commandSplit[0] === 'grind') {
-			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
-			clientLookup.forEach(function(result, index) {
-				if(result.name === nameLower) {
-					result.queue.push(parsePacket);
-				};
-			});
-		}
-		else if(commandSplit[0] === 'combat') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
 			clientLookup.forEach(function(result, index) {
 				if(result.name === nameLower) {

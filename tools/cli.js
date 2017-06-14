@@ -15,6 +15,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 		//To use modhp, type "gm hp [playername] [hpvalue] [limb]"
 		//the hpvalue can be positive or negative. It will add or subtract that much HP, but stay within the maximum and minimum.
 		//[limb] can also be 'all', in which case all limbs will be modified.
+		//NOTE: DO _NOT_ use more than one word to refer to a limb when using this command. 
 		if (commandSplit[1] == "hp") {
 			players.forEach(function(result, index) {
 			var target = JSON.parse(result);
@@ -36,23 +37,19 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			});
 		};
 	}
-	//If command is 't' or 'say' then 'Local Chat'
+	//Local chat
 	 else if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
 		msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
 		io.emit('chat', msg);	
 		clientLookup.forEach(function(result, index) {
 			if(result.name === jsonOut.name.toLowerCase()) {
-				var seconds = Math.round(new Date().getTime() / 1000); 
-				var time = seconds + 0;
-				result.timer = time; 
-				console.log('result.timer: '+(result.timer - seconds)); 
-				io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+				ParseSetTime(io, result, 0);
 			};
 		});
 		return true;
 	}
-	//Standard Attack function
-	else if(commandSplit[0] == 'a') {
+	//Standard Attack
+	else if(commandSplit[0] == 'a' || commandSplit[0] == 'attack' || commandSplit[0] == 'hit' || commandSplit[0] == 'punch') {
 		if(commandSplit[1] == null) {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You must specify what you want to attack!"}));
 			return false
@@ -80,13 +77,14 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			});					
 			//If positions are the same, output info on target
 			if (playerPos[0] == targetPos[0] && playerPos[1] == targetPos[1]) {
-				//Determine what type of weapon player is using. (For now, it is just 'unarmed')
-				//Roll skill to see if player hits or misses the target
+				//TODO(Gosts): Determine what type of weapon player is using. (For now, it is just 'unarmed')
+				//TODO(Gosts): Roll skill to see if player hits or misses the target
 				//Determine what body part is hit
 				var limbHit = playerTools.getLimbRand(target, player.stances[0]);
-				//Apply damage
-				msg = JSON.stringify({"command":"wowee u sure attacked them"}); //TODO(torchhound) add timer
+				//TODO(Gosts): Apply damage
+				msg = JSON.stringify({"command":"wowee u sure attacked them"});
 				io.of('/').to(socketId).emit('log', msg);
+				ParseSetTime(io, result, 4);
 				return true;
 			}
 			else {
@@ -96,7 +94,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			};
 		};
 	}
-	//Grind is a temporary skill but this can be used as the base for most self-only skills.
+	//Grind (temporary skill but this can be used as the base for most self-only skills.)
 	else if(commandSplit[0] === 'grind') {
 		players.forEach(function(result, index) {
 			var playerOut = JSON.parse(result);
@@ -105,38 +103,15 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 				msg = skillOut.text;
 				//If EXP has changed, update player
 				if (skillOut.success == false) players[index] = JSON.stringify(playerOut);
-				socket.emit('log', JSON.stringify({"command":msg}));
 				io.of('/').to(socketId).emit('log', JSON.stringify({"command":msg}));
 				return true;
 			};
 		});
 		clientLookup.forEach(function(result, index) {
 			if(result.name === jsonOut.name.toLowerCase()) {
-				var seconds = Math.round(new Date().getTime() / 1000); 
-				var time = seconds + 0;
-				result.timer = time; 
-				console.log('result.timer: '+(result.timer - seconds)); 
-				io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+				ParseSetTime(io, result, 0);
 			};
 		});
-	}
-	else if(commandSplit[0] === 'combat') {
-		if(commandSplit[1] == null){
-			io.of('/').to(socketId).emit('combat', JSON.stringify({"queue":"No queued action", "log":"Intentionally left blank"}));
-			clientLookup.forEach(function(result, index) {
-				if(result.name === jsonOut.name.toLowerCase()) {
-					var seconds = Math.round(new Date().getTime() / 1000); 
-					var time = seconds + 0;
-					result.timer = time; 
-					console.log('result.timer: '+(result.timer - seconds)); 
-					io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
-				};
-			});
-			return true;
-		} else {
-			io.of('/').to(socketId).emit('combat', JSON.stringify({"queue":commandSplit[1], "log":"Intentionally left blank"}));
-			return true;
-		};
 	}
 	else if(commandSplit[0] === 'pickup'  || commandSplit[0] === 'g' || commandSplit[0] === 'take' || commandSplit[0] === 'get' || commandSplit[0] === 'grab' || commandSplit[0] === 'pick') {
 		if(commandSplit[1] == null){
@@ -147,11 +122,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			if(check == true) {
 				clientLookup.forEach(function(result, index) {
 					if(result.name === jsonOut.name.toLowerCase()) {
-						var seconds = Math.round(new Date().getTime() / 1000); 
-						var time = seconds + 1;
-						result.timer = time; 
-						console.log('result.timer: '+(result.timer - seconds)); 
-						io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+						ParseSetTime(io, result, 1);
 					};
 				});
 			};
@@ -170,11 +141,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			if(check == true) {
 				clientLookup.forEach(function(result, index) {
 					if(result.name === jsonOut.name.toLowerCase()) {
-						var seconds = Math.round(new Date().getTime() / 1000); 
-						var time = seconds + 1;
-						result.timer = time; 
-						console.log('result.timer: '+(result.timer - seconds)); 
-						io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+						ParseSetTime(io, result, 1);
 					};
 				});
 			};
@@ -193,11 +160,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			if(check == true) {
 				clientLookup.forEach(function(result, index) {
 					if(result.name === jsonOut.name.toLowerCase()) {
-						var seconds = Math.round(new Date().getTime() / 1000); 
-						var time = seconds + 1;
-						result.timer = time; 
-						console.log('result.timer: '+(result.timer - seconds)); 
-						io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+						ParseSetTime(io, result, 1);
 					};
 				});
 			};
@@ -216,11 +179,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			if(check == true) {
 				clientLookup.forEach(function(result, index) {
 					if(result.name === jsonOut.name.toLowerCase()) {
-						var seconds = Math.round(new Date().getTime() / 1000); 
-						var time = seconds + 1;
-						result.timer = time; 
-						console.log('result.timer: '+(result.timer - seconds)); 
-						io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+						ParseSetTime(io, result, 1);
 					};
 				});
 			};
@@ -240,11 +199,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			if(check == true) {
 				clientLookup.forEach(function(result, index) {
 					if(result.name === jsonOut.name.toLowerCase()) {
-						var seconds = Math.round(new Date().getTime() / 1000); 
-						var time = seconds + 3;
-						result.timer = time; 
-						console.log('result.timer: '+(result.timer - seconds)); 
-						io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+						ParseSetTime(io, result, 3);
 					};
 				});
 			};
@@ -274,11 +229,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 							foundTarget = true;
 							clientLookup.forEach(function(result, index) {
 								if(result.name === jsonOut.name.toLowerCase()) {
-									var seconds = Math.round(new Date().getTime() / 1000); 
-									var time = seconds + 1; 
-									result.timer = time; 
-									console.log('result.timer: '+(result.timer - seconds)); 
-									io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+									ParseSetTime(io, result, 0);
 								};
 							});
 							return true;
@@ -325,11 +276,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 					};
 					clientLookup.forEach(function(result, index) {
 						if(result.name === jsonOut.name.toLowerCase()) {
-							var seconds = Math.round(new Date().getTime() / 1000); 
-							var time = seconds + 1;
-							result.timer = time; 
-							console.log('result.timer: '+(result.timer - seconds)); 
-							io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+							ParseSetTime(io, result, 0);
 						};
 					});
 					return true;
@@ -340,11 +287,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 					io.of('/').to(socketId).emit('log', msg);
 					clientLookup.forEach(function(result, index) {
 						if(result.name === jsonOut.name.toLowerCase()) {
-							var seconds = Math.round(new Date().getTime() / 1000); 
-							var time = seconds + 1;
-							result.timer = time; 
-							console.log('result.timer: '+(result.timer - seconds)); 
-							io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+							ParseSetTime(io, result, 0);
 						};
 					});
 					return true;
@@ -379,11 +322,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 					};	
 					clientLookup.forEach(function(result, index) {
 						if(result.name === jsonOut.name.toLowerCase()) {
-							var seconds = Math.round(new Date().getTime() / 1000); 
-							var time = seconds + 1;
-							result.timer = time; 
-							console.log('result.timer: '+(result.timer - seconds)); 
-							io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+							ParseSetTime(io, result, 0);
 						};
 					});
 					return true;	
@@ -403,11 +342,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						foundTarget = true;
 						clientLookup.forEach(function(result, index) {
 							if(result.name === jsonOut.name.toLowerCase()) {
-								var seconds = Math.round(new Date().getTime() / 1000); 
-								var time = seconds + 1;
-								result.timer = time; 
-								console.log('result.timer: '+(result.timer - seconds)); 
-								io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+								ParseSetTime(io, result, 0);
 							};
 						});
 						return true;
@@ -424,11 +359,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 									foundTarget = true;
 									clientLookup.forEach(function(result, index) {
 										if(result.name === jsonOut.name.toLowerCase()) {
-											var seconds = Math.round(new Date().getTime() / 1000); 
-											var time = seconds + 1;
-											result.timer = time; 
-											console.log('result.timer: '+(result.timer - seconds)); 
-											io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+											ParseSetTime(io, result, 0);
 										};
 									});
 									return true;
@@ -446,11 +377,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 							foundTarget = true;
 							clientLookup.forEach(function(result, index) {
 								if(result.name === jsonOut.name.toLowerCase()) {
-									var seconds = Math.round(new Date().getTime() / 1000); 
-									var time = seconds + 1;
-									result.timer = time; 
-									console.log('result.timer: '+(result.timer - seconds)); 
-									io.of('/').to(result.socketId).emit('timer', JSON.stringify({"timer":(result.timer - seconds)}));
+									ParseSetTime(io, result, 0);
 								};
 							});
 							return true;
@@ -472,3 +399,12 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 		return false;
 	};
 };
+
+ParseSetTime = function(io, player, time) {
+	if (time == 0) return;
+	var seconds = Math.round(new Date().getTime() / 1000); 
+	var time = seconds + time;
+	player.timer = time; 
+	console.log('player.timer: '+(player.timer - seconds)); 
+	io.of('/').to(player.socketId).emit('timer', JSON.stringify({"timer":(player.timer - seconds)}));
+}
