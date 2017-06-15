@@ -13,7 +13,7 @@ function countdown(count) {
     /*}
   );  */ 
   if(count > 0) {
-    setInterval(countdown(count - 1), 1000);
+    setTimeout(countdown(count - 1), 1000);
   };
 };
 
