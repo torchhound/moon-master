@@ -8,7 +8,10 @@ var exports = module.exports = {};
 const HEALTH_TO_LIVE = 2;
 
 //Takes in a skill, the base chance the check will succeed, the chance increase (in percentile points) per rank in the skill, and the exp awarded for trying and failing. 
-//returns "" on a success, or information about the failure if you failed.
+//returns a message and success bool
+//successbase: Base chance to succeed, in percent
+//successSkillMod: The percentile point modifier for success by the skill.
+//exp: The exp that can be gained. If -1, then no experience is gained.
 exports.skillCheck = function(player, skill, successBase, successSkillMod, exp) {
 	var roll = Math.floor((Math.random() * 100) + 1)-(player.skills[skill].rank*successSkillMod);
 	returnPacket = {text:"", success:false};
@@ -16,7 +19,10 @@ exports.skillCheck = function(player, skill, successBase, successSkillMod, exp) 
 		returnPacket.text = "Success!";
 		returnPacket.success = true;
 	} else {
-		returnPacket.text = "Failure! (" + exports.skillIncrease(player, skill, exp) + ")"; 
+		if (exp == -1)
+			returnPacket.text = "Failure!"; 
+		else
+			returnPacket.text = "Failure! (" + exports.skillIncrease(player, skill, exp) + ")";
 	};
 	return returnPacket;
 };

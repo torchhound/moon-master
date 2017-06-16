@@ -15,7 +15,6 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 		//To use modhp, type "gm hp [playername] [hpvalue] [limb]"
 		//the hpvalue can be positive or negative. It will add or subtract that much HP, but stay within the maximum and minimum.
 		//[limb] can also be 'all', in which case all limbs will be modified.
-		//NOTE: DO _NOT_ use more than one word to refer to a limb when using this command. 
 		if (commandSplit[1] == "hp") {
 			players.forEach(function(result, index) {
 			var target = JSON.parse(result);
@@ -75,16 +74,20 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 					targetIndex = index;
 				};
 			});					
-			//If positions are the same, output info on target
+			//If positions are the same, attack.
 			if (playerPos[0] == targetPos[0] && playerPos[1] == targetPos[1]) {
 				//TODO(Gosts): Determine what type of weapon player is using. (For now, it is just 'unarmed')
 				//TODO(Gosts): Roll skill to see if player hits or misses the target
 				//Determine what body part is hit
 				var limbHit = playerTools.getLimbRand(target, player.stances[0]);
 				//TODO(Gosts): Apply damage
+				playerTools.setLimbHealth(target, 0, -1);
+				players[targetIndex] = JSON.stringify(target);
+				//Output messages for the player, target and any bystanders.
 				msg = JSON.stringify({"command":"wowee u sure attacked them"});
 				io.of('/').to(socketId).emit('log', msg);
-				ParseSetTime(io, result, 4);
+				//Set cooldown for the attacking player
+				ParseSetTime(io, player, 4);
 				return true;
 			}
 			else {
@@ -103,6 +106,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 				msg = skillOut.text;
 				//If EXP has changed, update player
 				if (skillOut.success == false) players[index] = JSON.stringify(playerOut);
+				//Print results
 				io.of('/').to(socketId).emit('log', JSON.stringify({"command":msg}));
 				return true;
 			};
