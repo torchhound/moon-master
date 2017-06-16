@@ -78,14 +78,44 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			if (playerPos[0] == targetPos[0] && playerPos[1] == targetPos[1]) {
 				//TODO(Gosts): Determine what type of weapon player is using. (For now, it is just 'unarmed')
 				//TODO(Gosts): Roll skill to see if player hits or misses the target
+				
 				//Determine what body part is hit
 				var limbHit = playerTools.getLimbRand(target, player.stances[0]);
-				//TODO(Gosts): Apply damage
-				playerTools.setLimbHealth(target, 0, -1);
+				
+				//Apply damage
+				playerTools.setLimbHealth(target, limbHit, -1);
 				players[targetIndex] = JSON.stringify(target);
+
 				//Output messages for the player, target and any bystanders.
-				msg = JSON.stringify({"command":"wowee u sure attacked them"});
-				io.of('/').to(socketId).emit('log', msg);
+				var roomCurrent = JSON.parse(map.map[playerPos[0]][playerPos[1]]);	
+				for(var x in roomCurrent.players) {
+					clientLookup.forEach(function(result, index) {
+						if(result.name === roomCurrent.players[x]) {
+							var name1;
+							var name2;
+							var attackFlavor = " punched ";
+							var	bodyPartName = target.limbs[limbHit].name;
+							if (result.name != player.name)
+								name1 = player.namePrint;
+							else
+								name1 = "You";
+							if (result.name != target.name)
+								if (player.name == target.name)
+									name2 = "themself";
+								else
+									name2 = target.namePrint;
+							else
+								if (player.name == target.name)
+									name2 = "yourself";
+								else
+									name2 = "you";
+							io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":name1+attackFlavor+name2+" in the "+bodyPartName}));
+						};
+					});
+				};
+			
+				
+
 				//Set cooldown for the attacking player
 				ParseSetTime(io, player, 4);
 				return true;
@@ -97,6 +127,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			};
 		};
 	}
+
 	//Grind (temporary skill but this can be used as the base for most self-only skills.)
 	else if(commandSplit[0] === 'grind') {
 		players.forEach(function(result, index) {
@@ -117,6 +148,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			};
 		});
 	}
+
 	else if(commandSplit[0] === 'pickup'  || commandSplit[0] === 'g' || commandSplit[0] === 'take' || commandSplit[0] === 'get' || commandSplit[0] === 'grab' || commandSplit[0] === 'pick') {
 		if(commandSplit[1] == null){
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
