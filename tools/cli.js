@@ -83,18 +83,23 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 				var limbHit = playerTools.getLimbRand(target, player.stances[0]);
 				
 				//Apply damage
-				playerTools.setLimbHealth(target, limbHit, -1);
+				var damage = Math.floor((Math.random() * 10) + 1)+(player.skills[1].rank);
+				var newHP = playerTools.setLimbHealth(target, limbHit, -damage);
 				players[targetIndex] = JSON.stringify(target);
 
 				//Output messages for the player, target and any bystanders.
 				var roomCurrent = JSON.parse(map.map[playerPos[0]][playerPos[1]]);	
+				var name1;
+				var name2;
+				var attackFlavor = " punched ";
+				var	bodyPartName = target.limbs[limbHit].name;
+				var destructionFlavor = "";
+				if (newHP == 0)
+					destructionFlavor = ", and destroyed the "+bodyPartName+"!";
 				for(var x in roomCurrent.players) {
 					clientLookup.forEach(function(result, index) {
 						if(result.name === roomCurrent.players[x]) {
-							var name1;
-							var name2;
-							var attackFlavor = " punched ";
-							var	bodyPartName = target.limbs[limbHit].name;
+							
 							if (result.name != player.name)
 								name1 = player.namePrint;
 							else
@@ -109,12 +114,15 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 									name2 = "yourself";
 								else
 									name2 = "you";
-							io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":name1+attackFlavor+name2+" in the "+bodyPartName}));
+							io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":name1+attackFlavor+name2+" in the "+bodyPartName+destructionFlavor}));
+
+							if (result.name == player.name)
+								io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":"You dealt "+damage+" damage!"}));
+							else if (result.name == target.name)
+								io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":"You received "+damage+" damage!"}));
 						};
 					});
 				};
-			
-				
 
 				//Set cooldown for the attacking player
 				ParseSetTime(io, player, 4);
