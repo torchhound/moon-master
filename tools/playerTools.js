@@ -35,6 +35,7 @@ exports.skillIncrease = function(player, skill, exp) {
 	while (player.skills[skill].exp >= exports.expNeeded(player.skills[skill].rank)) {
 		player.skills[skill].exp -= exports.expNeeded(player.skills[skill].rank);
 		player.skills[skill].rank++;
+		ranksGained++;
 	};
 	output = "You gained " + exp + " " + player.skills[skill].name + " EXP!"
 	if (ranksGained > 0) output += " Your rank increased by " + ranksGained + "!";
@@ -47,7 +48,7 @@ exports.expNeeded = function(rank) {
 	return Math.round(Math.pow(rank, 1.1) * 100)
 };
 
-//Set the limb health to a new value. If above max, set to max. If zero or lower, set quality to zero. Returns new health value.
+//Set the limb health to a new value. If above max, set to max. If zero or lower, set quality to zero. (limb was destroyed) Returns new health value.
 exports.setLimbHealth = function(player, limbNum, adjustment) {
 	console.log("before: "+player.limbs[limbNum].health);
 	player.limbs[limbNum].health += Number(adjustment);

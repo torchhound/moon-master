@@ -76,34 +76,54 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			});					
 			//If positions are the same, attack.
 			if (playerPos[0] == targetPos[0] && playerPos[1] == targetPos[1]) {
-				//TODO(Gosts): Determine what type of weapon player is using. (For now, it is just 'unarmed')
-				//TODO(Gosts): Roll skill to see if player hits or misses the target
-				
-				//Determine what body part is hit
-				var limbHit = playerTools.getLimbRand(target, player.stances[0]);
-				
-				//Apply damage
-				var damage = Math.floor((Math.random() * 10) + 1)+(player.skills[1].rank);
-				var newHP = playerTools.setLimbHealth(target, limbHit, -damage);
-				players[targetIndex] = JSON.stringify(target);
-
-				//Output messages for the player, target and any bystanders.
+				//Prepare variables
+				var damage = -1;
+				var newHP = -1;
+				var limbHit = playerTools.getLimbRand(target, player.stances[0]); //Determine what body part is hit
 				var roomCurrent = JSON.parse(map.map[playerPos[0]][playerPos[1]]);	
 				var name1;
 				var name2;
-				var attackFlavor = " punched ";
+				var weaponSkillType = 0;
+				var attackFlavor = " voidattacktype ";
 				var	bodyPartName = target.limbs[limbHit].name;
-				var destructionFlavor = "";
-				if (newHP == 0)
-					destructionFlavor = ", and destroyed the "+bodyPartName+"!";
+				var extraFlavorText = "";
+
+				//TODO(Gosts): Determine what type of weapon player is using. (For now, it is just 'unarmed')
+				weaponSkillType = 1;
+				attackFlavor = " punched ";
+
+				//TODO(Gosts): Roll skill to see if player hits or misses the target
+				skillOut = playerTools.skillCheck(player, weaponSkillType, 70, 1, 20);
+				//Print skill message to player
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":skillOut.text}));
+
+				if (skillOut.success == true) {
+					//Apply damage
+					damage = Math.floor((Math.random() * 10) + 1)+(player.skills[1].rank);
+					newHP = playerTools.setLimbHealth(target, limbHit, -damage);
+					players[targetIndex] = JSON.stringify(target);
+					if (newHP == 0)
+						extraFlavorText = ", and destroyed the "+bodyPartName+"!";
+				}
+				else {
+					extraFlavorText = ", but missed!";
+					//EXP has changed, so we must update the player
+					players[playerIndex] = JSON.stringify(player);
+				}
+
+				//Output messages for the player, target and any bystanders.
+				//Also, set the cooldown timer for the player.
 				for(var x in roomCurrent.players) {
 					clientLookup.forEach(function(result, index) {
 						if(result.name === roomCurrent.players[x]) {
 							
 							if (result.name != player.name)
 								name1 = player.namePrint;
-							else
+							else {
 								name1 = "You";
+								//Set cooldown for the attacking player
+								ParseSetTime(io, result, 4);
+							}
 							if (result.name != target.name)
 								if (player.name == target.name)
 									name2 = "themself";
@@ -114,18 +134,18 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 									name2 = "yourself";
 								else
 									name2 = "you";
-							io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":name1+attackFlavor+name2+" in the "+bodyPartName+destructionFlavor}));
-
-							if (result.name == player.name)
-								io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":"You dealt "+damage+" damage!"}));
-							else if (result.name == target.name)
-								io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":"You received "+damage+" damage!"}));
+							io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":name1+attackFlavor+name2+" in the "+bodyPartName+extraFlavorText}));
+							if (damage != -1) {
+								if (result.name == player.name)
+									io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":"You dealt "+damage+" damage!"}));
+								else if (result.name == target.name)
+									io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":"You received "+damage+" damage!"}));
+							};
 						};
 					});
 				};
 
-				//Set cooldown for the attacking player
-				ParseSetTime(io, player, 4);
+				
 				return true;
 			}
 			else {
