@@ -6,7 +6,7 @@ exports.drop = function(item, jsonOut, socketId, players, map, clientLookup, io)
 	var position;
 	var droppedItem;
 	var playerIndex;
-	var foundItem;
+	var foundItem = false;
 	players.forEach(function(result, index) { 
 		var playerOut = JSON.parse(result);
 		if(playerOut.name === jsonOut.name.toLowerCase()) {
