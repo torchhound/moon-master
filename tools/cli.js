@@ -179,7 +179,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 
 	else if(commandSplit[0] === 'pickup'  || commandSplit[0] === 'g' || commandSplit[0] === 'take' || commandSplit[0] === 'get' || commandSplit[0] === 'grab' || commandSplit[0] === 'pick') {
 		if(commandSplit[1] == null){
-			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You must specify something to take."}));
 			return false;
 		} else if(commandSplit[1] != null) {
 			var check = itemTools.pickup(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
@@ -189,16 +189,15 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						ParseSetTime(io, result, 1);
 					};
 				});
+			} else {
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to take"}));
 			};
 			return check;
-		} else {
-			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to pickup"}));
-			return false;
 		};
 	}
 	else if(commandSplit[0] === 'drop' || commandSplit[0] === 'd') {
 		if(commandSplit[1] == null){
-			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You must specify something to drop"}));
 			return false;
 		} else if(commandSplit[1] != null) { 
 			var check = itemTools.drop(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
@@ -208,16 +207,15 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						ParseSetTime(io, result, 1);
 					};
 				});
+			} else {
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
 			};
 			return check;
-		} else {
-			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to drop"}));
-			return false;
 		};
 	}
 	else if(commandSplit[0] === 'equip' || commandSplit[0] === 'q') {
 		if(commandSplit[1] == null){
-			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to equip"}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You must specify something to equip"}));
 			return false;
 		} else if(commandSplit[1] != null) { 
 			var check = itemTools.equip(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
@@ -227,16 +225,15 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						ParseSetTime(io, result, 1);
 					};
 				});
+			} else {
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to equip"}));
 			};
 			return check;
-		} else {
-			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to equip"}));
-			return false;
 		};
 	}
 	else if(commandSplit[0] === 'unequip' || commandSplit[0] === 'u') {
 		if(commandSplit[1] == null){
-			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to unequip"}));
+			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You must specify something to unequip"}));
 			return false;
 		} else if(commandSplit[1] != null) { 
 			var check = itemTools.unequip(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
@@ -246,11 +243,10 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						ParseSetTime(io, result, 1);
 					};
 				});
+			} else {
+				io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to unequip"}));
 			};
 			return check;
-		} else {
-			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to unequip"}));
-			return false;
 		};
 	}
 	//If command is "move"
