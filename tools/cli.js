@@ -7,7 +7,7 @@ var config = require('../config')[env];
 var exports = module.exports = {};
 
 //parses commands
-exports.parse = function(packet, clientLookup, players, map, socketId, io) {
+exports.parse = function(packet, players, map, socketId, io) {
 	var jsonOut = packet.json;
 	var commandSplit = packet.commandSplit;
 	//GM commands; to disable cheating, simply set 'true' to 'false'
@@ -40,7 +40,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 	 else if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
 		msg = JSON.stringify({"namePrint":jsonOut.name+" says", "command":'\"'+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+'\"'});
 		io.emit('chat', msg);	
-		clientLookup.forEach(function(result, index) {
+		players.forEach(function(result, index) {
 			if(result.name === jsonOut.name.toLowerCase()) {
 				ParseSetTime(io, result, 0);
 			};
@@ -114,7 +114,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 				//Output messages for the player, target and any bystanders.
 				//Also, set the cooldown timer for the player.
 				for(var x in roomCurrent.players) {
-					clientLookup.forEach(function(result, index) {
+					players.forEach(function(result, index) {
 						if(result.name === roomCurrent.players[x]) {
 							
 							if (result.name != player.name)
@@ -170,7 +170,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 				return true;
 			};
 		});
-		clientLookup.forEach(function(result, index) {
+		players.forEach(function(result, index) {
 			if(result.name === jsonOut.name.toLowerCase()) {
 				ParseSetTime(io, result, 0);
 			};
@@ -182,9 +182,9 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You must specify something to take."}));
 			return false;
 		} else if(commandSplit[1] != null) {
-			var check = itemTools.pickup(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			var check = itemTools.pickup(commandSplit[1], jsonOut, socketId, players, map, io);
 			if(check == true) {
-				clientLookup.forEach(function(result, index) {
+				players.forEach(function(result, index) {
 					if(result.name === jsonOut.name.toLowerCase()) {
 						ParseSetTime(io, result, 1);
 					};
@@ -200,9 +200,9 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You must specify something to drop"}));
 			return false;
 		} else if(commandSplit[1] != null) { 
-			var check = itemTools.drop(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			var check = itemTools.drop(commandSplit[1], jsonOut, socketId, players, map, io);
 			if(check == true) {
-				clientLookup.forEach(function(result, index) {
+				players.forEach(function(result, index) {
 					if(result.name === jsonOut.name.toLowerCase()) {
 						ParseSetTime(io, result, 1);
 					};
@@ -218,9 +218,9 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You must specify something to equip"}));
 			return false;
 		} else if(commandSplit[1] != null) { 
-			var check = itemTools.equip(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			var check = itemTools.equip(commandSplit[1], jsonOut, socketId, players, map, io);
 			if(check == true) {
-				clientLookup.forEach(function(result, index) {
+				players.forEach(function(result, index) {
 					if(result.name === jsonOut.name.toLowerCase()) {
 						ParseSetTime(io, result, 1);
 					};
@@ -236,9 +236,9 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"You must specify something to unequip"}));
 			return false;
 		} else if(commandSplit[1] != null) { 
-			var check = itemTools.unequip(commandSplit[1], jsonOut, socketId, players, map, clientLookup, io);
+			var check = itemTools.unequip(commandSplit[1], jsonOut, socketId, players, map, io);
 			if(check == true) {
-				clientLookup.forEach(function(result, index) {
+				players.forEach(function(result, index) {
 					if(result.name === jsonOut.name.toLowerCase()) {
 						ParseSetTime(io, result, 1);
 					};
@@ -255,9 +255,9 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 			io.of('/').to(socketId).emit('log', JSON.stringify({"command":"There is no \""+jsonOut.command.substr(jsonOut.command.indexOf(" ") + 1)+"\" to move to"}));
 			return false;
 		} else if(commandSplit[1] != null) { 
-			var check = playerTools.move(commandSplit[1], players, jsonOut, socketId, clientLookup, io, map);
+			var check = playerTools.move(commandSplit[1], players, jsonOut, socketId, io, map);
 			if(check == true) {
-				clientLookup.forEach(function(result, index) {
+				players.forEach(function(result, index) {
 					if(result.name === jsonOut.name.toLowerCase()) {
 						ParseSetTime(io, result, 3);
 					};
@@ -287,7 +287,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 							msg = JSON.stringify({"command":"examine: "+roomOut.name+"; Players: "+roomOut.players+"; Contents: "+roomOut.inventory});
 							io.of('/').to(socketId).emit('log', msg);
 							foundTarget = true;
-							clientLookup.forEach(function(result, index) {
+							players.forEach(function(result, index) {
 								if(result.name === jsonOut.name.toLowerCase()) {
 									ParseSetTime(io, result, 0);
 								};
@@ -334,7 +334,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						msg = JSON.stringify({"command":playerTools.printLimbStatus(target, i)});
 						io.of('/').to(socketId).emit('log', msg);
 					};
-					clientLookup.forEach(function(result, index) {
+					players.forEach(function(result, index) {
 						if(result.name === jsonOut.name.toLowerCase()) {
 							ParseSetTime(io, result, 0);
 						};
@@ -345,7 +345,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 					//Player wants to know about a specific limb
 					msg = JSON.stringify({"command":playerTools.printLimbStatus(target, limbNumber)});
 					io.of('/').to(socketId).emit('log', msg);
-					clientLookup.forEach(function(result, index) {
+					players.forEach(function(result, index) {
 						if(result.name === jsonOut.name.toLowerCase()) {
 							ParseSetTime(io, result, 0);
 						};
@@ -380,7 +380,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						msg = JSON.stringify({"command":target.skills[i].name+": Rank "+target.skills[i].rank+" (EXP: "+target.skills[i].exp+"/"+playerTools.expNeeded(target.skills[i].rank)+")"});
 						io.of('/').to(socketId).emit('log', msg);
 					};	
-					clientLookup.forEach(function(result, index) {
+					players.forEach(function(result, index) {
 						if(result.name === jsonOut.name.toLowerCase()) {
 							ParseSetTime(io, result, 0);
 						};
@@ -400,7 +400,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 						console.log(inventoryOut);
 						io.of('/').to(socketId).emit('log', JSON.stringify({"command":inventoryOut.name})); //TODO(torchhound) add more item attributes
 						foundTarget = true;
-						clientLookup.forEach(function(result, index) {
+						players.forEach(function(result, index) {
 							if(result.name === jsonOut.name.toLowerCase()) {
 								ParseSetTime(io, result, 0);
 							};
@@ -417,7 +417,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 								if(equipmentOut.name === commandSplit[1]) {
 									io.of('/').to(socketId).emit('log', JSON.stringify({"command":equipmentOut.name}));
 									foundTarget = true;
-									clientLookup.forEach(function(result, index) {
+									players.forEach(function(result, index) {
 										if(result.name === jsonOut.name.toLowerCase()) {
 											ParseSetTime(io, result, 0);
 										};
@@ -435,7 +435,7 @@ exports.parse = function(packet, clientLookup, players, map, socketId, io) {
 							console.log(inventoryOut);
 							io.of('/').to(socketId).emit('log', JSON.stringify({"command":inventoryOut.name})); //TODO(torchhound) add more item attributes
 							foundTarget = true;
-							clientLookup.forEach(function(result, index) {
+							players.forEach(function(result, index) {
 								if(result.name === jsonOut.name.toLowerCase()) {
 									ParseSetTime(io, result, 0);
 								};

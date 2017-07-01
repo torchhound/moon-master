@@ -170,7 +170,7 @@ exports.healthTotalMax = function(player) {
 	return tmp;
 };
 
-exports.move = function(direction, players, jsonOut, socketId, clientLookup, io, map) {
+exports.move = function(direction, players, jsonOut, socketId, io, map) {
 	var position;
 	var playerIndex;
 	players.forEach(function(result, index) {
@@ -251,14 +251,14 @@ exports.move = function(direction, players, jsonOut, socketId, clientLookup, io,
  	var newRoomOut = JSON.parse(map.map[p1][p2]);
 	if(newRoomOut.players.indexOf(jsonOut.name.toLowerCase()) === -1) {
 		for(var x in oldRoomOut.players) {
-			clientLookup.forEach(function(result, index) {
+			players.forEach(function(result, index) {
 				if(result.name === oldRoomOut.players[x]) {
 					io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":jsonOut.name+" moved out of your room"}));
 				};
 			});
 		};
 		for(var x in newRoomOut.players) {
-			clientLookup.forEach(function(result, index) {
+			players.forEach(function(result, index) {
 				if(result.name === newRoomOut.players[x]) {
 					io.of('/').to(result.socketId).emit('log', JSON.stringify({"command":jsonOut.name+" moved into your room"}));
 				};

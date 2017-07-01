@@ -6,12 +6,10 @@ var config = require('../config')[env];
 
 var exports = module.exports = {};
 
-exports.login = function(socket, io, clientLookup, players) { 
+exports.login = function(socket, io,players) { 
 	return function(msg) {
 		var jsonOut = JSON.parse(msg);
-		var potentialAdd = {name:jsonOut.name.toLowerCase(), socketId:socket.id, queue:[], timer:0};
-		clientLookup.indexOf(potentialAdd) === -1 ? clientLookup.push(potentialAdd) : console.log('login: Client already exists in array');
-		var player = new Player(jsonOut.name);
+		var player = new Player(jsonOut.name, socket.id);
 		var playerIn = JSON.stringify(player);
 		players.indexOf(playerIn) === -1 ? players.push(playerIn) : console.log('login: Player already exists in array'); 
 	};

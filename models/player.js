@@ -1,6 +1,7 @@
 module.exports = class Player {
-	constructor(name){
+	constructor(name, socketId){
 		this.namePrint = name;
+		this.socketId = socketId;
 		this.name = name.toLowerCase();
 		//Stances are just simple integer values.
 		//The 'stances' array contains all of a player's stances.
@@ -45,5 +46,7 @@ module.exports = class Player {
 		this.position = [0, 0];
 		this.inventory = [];
 		this.equipment = [];
+		this.queue = [];
+		this.timer = 0;
 	};	
 };

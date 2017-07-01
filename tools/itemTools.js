@@ -1,6 +1,6 @@
 var exports = module.exports = {};
 
-exports.drop = function(item, jsonOut, socketId, players, map, clientLookup, io) {
+exports.drop = function(item, jsonOut, socketId, players, map, io) {
 	var inventory;
 	var equipment;
 	var position;
@@ -55,7 +55,7 @@ exports.drop = function(item, jsonOut, socketId, players, map, clientLookup, io)
 	return true;
 };
 
-exports.pickup = function(item, jsonOut, socketId, players, map, clientLookup, io) {
+exports.pickup = function(item, jsonOut, socketId, players, map, io) {
 	var inventory;
 	var position;
 	var pickupItem;
@@ -95,7 +95,7 @@ exports.pickup = function(item, jsonOut, socketId, players, map, clientLookup, i
 	return true;
 };
 
-exports.equip = function(item, jsonOut, socketId, players, map, clientLookup, io) {
+exports.equip = function(item, jsonOut, socketId, players, map, io) {
 	var inventory;
 	var equipment;
 	var position;
@@ -146,7 +146,7 @@ exports.equip = function(item, jsonOut, socketId, players, map, clientLookup, io
 	return true;
 };
 
-exports.unequip = function(item, jsonOut, socketId, players, map, clientLookup, io) {
+exports.unequip = function(item, jsonOut, socketId, players, map, io) {
 	var inventory;
 	var equipment;
 	var unequipItem;

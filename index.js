@@ -13,7 +13,6 @@ const port = config.server.port;
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-var clientLookup = []; //maps client's username to their socketId and action queue
 var players = []; //stores player objects
 var mapJson;
 
@@ -40,7 +39,7 @@ function logError(error, req, res, next){
 	next(error);
 };
 
-function parseCommand(socket, io, clientLookup) { 
+function parseCommand(socket, io) { 
 	return function(msg){
 		console.log('parseCommand');
 		var jsonOut = JSON.parse(msg);
@@ -49,7 +48,6 @@ function parseCommand(socket, io, clientLookup) {
 		//commandSplit is also put in lowercase for comparison with command words, which should all be lower case.
 		//Note that jsonOut.command has not been modified as we wish to preserve the exact spacing of the original message.
 		var commandSplit = jsonOut.command.toLowerCase().split(' ');
-		
 		//This section is the magic commandSplit fixer that fixes the stupid things dumb players try to enter as commands
 		//It does this by moving commandSplit over by one if people use dumb words that they shouldn't use in adventure games
 		//For example, 'look at', 'pick up', or putting 'the' after anything
@@ -70,87 +68,106 @@ function parseCommand(socket, io, clientLookup) {
 			};
 			commandSplit[0] = "go";
 		};
-		
 		//Determine what function is being called;
 		if(commandSplit[0] == 'gm') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
-			clientLookup.forEach(function(result, index) {
-				if(result.name === nameLower) {
-					result.queue.push(parsePacket);
-				}; 
+			players.forEach(function(result, index) {
+				var playerOut = JSON.parse(result);	
+				if(playerOut.name === nameLower) {
+					playerOut.queue.push(parsePacket);
+					players[index] = JSON.stringify(playerOut);
+				};
 			}); 
 		}
 		else if(commandSplit[0] == 't' || commandSplit[0] == 'say') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
-			clientLookup.forEach(function(result, index) {
-				if(result.name === nameLower) {
-					result.queue.push(parsePacket);
-				}; 
+			players.forEach(function(result, index) {
+				var playerOut = JSON.parse(result);	
+				if(playerOut.name === nameLower) {
+					playerOut.queue.push(parsePacket);
+					players[index] = JSON.stringify(playerOut);
+				};
 			}); 
 		}
 		else if(commandSplit[0] == 'a' || commandSplit[0] == 'attack' || commandSplit[0] == 'hit' || commandSplit[0] == 'punch') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
-			clientLookup.forEach(function(result, index) {
-				if(result.name === nameLower) {
-					result.queue.push(parsePacket);
-				}; 
+			players.forEach(function(result, index) {
+				var playerOut = JSON.parse(result);	
+				if(playerOut.name === nameLower) {
+					playerOut.queue.push(parsePacket);
+					players[index] = JSON.stringify(playerOut);
+				};
 			}); 
 		}
 		else if(commandSplit[0] === 'grind') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
-			clientLookup.forEach(function(result, index) {
-				if(result.name === nameLower) {
-					result.queue.push(parsePacket);
+			players.forEach(function(result, index) {
+				var playerOut = JSON.parse(result);	
+				if(playerOut.name === nameLower) {
+					playerOut.queue.push(parsePacket);
+					players[index] = JSON.stringify(playerOut);
 				};
 			});
 		}
 		else if(commandSplit[0] === 'pickup'  || commandSplit[0] === 'g' || commandSplit[0] === 'take' || commandSplit[0] === 'get' || commandSplit[0] === 'grab' || commandSplit[0] === 'pick') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
-			clientLookup.forEach(function(result, index) {
-				if(result.name === nameLower) {
-					result.queue.push(parsePacket);
+			players.forEach(function(result, index) {
+				var playerOut = JSON.parse(result);	
+				if(playerOut.name === nameLower) {
+					playerOut.queue.push(parsePacket);
+					players[index] = JSON.stringify(playerOut);
 				};
 			});
 		}
 		else if(commandSplit[0] === 'drop' || commandSplit[0] === 'd') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
-			clientLookup.forEach(function(result, index) {
-				if(result.name === nameLower) {
-					result.queue.push(parsePacket);
+			players.forEach(function(result, index) {
+				var playerOut = JSON.parse(result);	
+				if(playerOut.name === nameLower) {
+					playerOut.queue.push(parsePacket);
+					players[index] = JSON.stringify(playerOut);
 				};
 			});
 		}
 		else if(commandSplit[0] === 'equip' || commandSplit[0] === 'q') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
-			clientLookup.forEach(function(result, index) {
-				if(result.name === nameLower) {
-					result.queue.push(parsePacket);
+			players.forEach(function(result, index) {
+				var playerOut = JSON.parse(result);	
+				if(playerOut.name === nameLower) {
+					playerOut.queue.push(parsePacket);
+					players[index] = JSON.stringify(playerOut);
 				};
 			});
 		}
 		else if(commandSplit[0] === 'unequip' || commandSplit[0] === 'u') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
-			clientLookup.forEach(function(result, index) {
-				if(result.name === nameLower) {
-					result.queue.push(parsePacket);
+			players.forEach(function(result, index) {
+				var playerOut = JSON.parse(result);	
+				if(playerOut.name === nameLower) {
+					playerOut.queue.push(parsePacket);
+					players[index] = JSON.stringify(playerOut);
 				};
 			});
 		}
 		else if(commandSplit[0] === 'move' || commandSplit[0] === 'go') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
-			clientLookup.forEach(function(result, index) {
-				if(result.name === nameLower) {
-					result.queue.push(parsePacket);
+			players.forEach(function(result, index) {
+				var playerOut = JSON.parse(result);	
+				if(playerOut.name === nameLower) {
+					playerOut.queue.push(parsePacket);
+					players[index] = JSON.stringify(playerOut);
 				};
 			});
 		}
 		else if(commandSplit[0] === 'look' || commandSplit[0] === 'l' || commandSplit[0] === 'x' || commandSplit[0] === 'ex' ||commandSplit[0] === 'examine') {
 			var parsePacket = {json:jsonOut, commandSplit:commandSplit};
-			clientLookup.forEach(function(result, index) {
-				if(result.name === nameLower) {
-					console.log('parseCommand start queue: '+result.queue);
-					result.queue.push(parsePacket);
-					console.log('parseCommand end queue: '+result.queue);
+			players.forEach(function(result, index) {
+				var playerOut = JSON.parse(result);	
+				if(playerOut.name === nameLower) {
+					console.log('parseCommand start queue: '+playerOut.queue);
+					playerOut.queue.push(parsePacket);
+					console.log('parseCommand end queue: '+playerOut.queue);
+					players[index] = JSON.stringify(playerOut);
 				};
 			});
 		}
@@ -163,35 +180,37 @@ function parseCommand(socket, io, clientLookup) {
 
 function gameLoop() {
 	var seconds = Math.round(new Date().getTime() / 1000); 
-	clientLookup.forEach(function(result, index) {	
-		if(result.queue[0] === undefined) {
+	players.forEach(function(result, index) {
+		var playerOut = JSON.parse(result);	
+		if(playerOut.queue[0] === undefined) {
 			//pass
 		}
-		else if(result.timer < seconds) {
-			//console.log('gameLoop start queue: '+result.queue);
-			var check = cli.parse(result.queue[0], clientLookup, players, mapJson, result.socketId, io);
-			for(var x in result.queue) {
-				console.log(result.queue[x].json.command);
-				io.of('/').to(result.socketId).emit('queue', JSON.stringify({"queue":result.queue[x].json.command})); 
+		else if(playerOut.timer < seconds) {
+			//console.log('gameLoop start queue: '+playerOut.queue);
+			var check = cli.parse(playerOut.queue[0],players, mapJson, playerOut.socketId, io);
+			for(var x in playerOut.queue) {
+				console.log(playerOut.queue[x].json.command);
+				io.of('/').to(playerOut.socketId).emit('queue', JSON.stringify({"queue":playerOut.queue[x].json.command})); 
 			};
 			if(check == false) {
-				result.timer = 0; 
+				playerOut.timer = 0; 
 			};
-			result.queue.splice(0, 1);
-			//console.log('gameLoop end queue: '+result.queue);
+			playerOut.queue.splice(0, 1);
+			//console.log('gameLoop end queue: '+playerOut.queue);
 		}; 
+		players[index] = JSON.stringify(playerOut);
 	});
 	setImmediate(gameLoop);
 };
 
 io.on('connection', function(socket){
-	socket.on('login', api.login(socket, io, clientLookup, players));
+	socket.on('login', api.login(socket, io,players));
 	socket.on('newPlayer', api.newPlayer(socket, io, players, mapJson));
-	socket.on('command', parseCommand(socket, io, clientLookup));
+	socket.on('command', parseCommand(socket, io));
 	socket.on('disconnect', function(){
-    	clientLookup.forEach(function(result, index) {
+    	players.forEach(function(result, index) {
     		if(result.socketId === socket.id) {
-    			clientLookup.splice(index, 1);/*
+    			players.splice(index, 1);/*
     			for(var x in players) {
     				var playerOut = JSON.parse(players[x]);
     				if(result.name === playerOut.name) {
