@@ -17,7 +17,7 @@ exports.parse = function(packet, players, map, socketId, io) {
 		//[limb] can also be 'all', in which case all limbs will be modified.
 		if (commandSplit[1] == "hp") {
 			players.forEach(function(result, index) {
-			var target = JSON.parse(result);
+				var target = JSON.parse(result);
 				if (commandSplit[2] == target.name.toLowerCase()) {
 					if (commandSplit[4] == "all") {
 						for (var i = 0; i < target.limbs.length; i++) {

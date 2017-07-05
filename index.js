@@ -42,6 +42,7 @@ function logError(error, req, res, next){
 function parseCommand(socket, io) { 
 	return function(msg){
 		console.log('parseCommand');
+		console.log(players);
 		var jsonOut = JSON.parse(msg);
 		var nameLower = jsonOut.name.toLowerCase();
 		//commandSplit is each separate word of the command, which we will use to determine what actions the player wants to take.
