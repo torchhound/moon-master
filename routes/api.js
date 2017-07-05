@@ -14,7 +14,7 @@ exports.login = function(socket, io,players) {
 		var playerIn = JSON.stringify(player);
 		players.forEach(function(result, index) {
 			var playerOut = JSON.parse(result);	
-			if(playerOut.name === jsonOut.name) {
+			if(playerOut.name === jsonOut.name.toLowerCase()) {
 				console.log('login: Player already exists in array')
 				check = false
 			};
@@ -34,7 +34,7 @@ exports.newPlayer = function(socket, io, players, map) {
 		var playerIn = JSON.stringify(player);
 		players.forEach(function(result, index) {
 			var playerOut = JSON.parse(result);	
-			if(playerOut.name === jsonOut.name) {
+			if(playerOut.name === jsonOut.name.toLowerCase()) {
 				console.log('login: Player already exists in array')
 				check = false
 			};
